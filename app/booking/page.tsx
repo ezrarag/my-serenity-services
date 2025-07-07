@@ -1,252 +1,199 @@
 "use client"
-
 import { useState } from "react"
+import type React from "react"
+
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Calendar } from "@/components/ui/calendar"
-import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Navigation } from "@/components/navigation"
+import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Phone } from "lucide-react"
+import { Textarea } from "@/components/ui/textarea"
+import { Calendar } from "@/components/ui/calendar"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { ArrowLeft, CalendarIcon, Clock } from "lucide-react"
+import { format } from "date-fns"
+
+const services = [
+  { id: "cleaning", name: "House Cleaning", price: "$60/hour" },
+  { id: "cooking", name: "Meal Preparation", price: "$50/hour" },
+  { id: "combo", name: "Cleaning + Cooking", price: "$75/hour" },
+  { id: "massage-60", name: "Full Body Massage (60 min)", price: "$100" },
+  { id: "massage-30", name: "Express Massage (30 min)", price: "$50" },
+]
+
+const timeSlots = ["9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"]
 
 export default function BookingPage() {
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date())
-  const [selectedService, setSelectedService] = useState("")
-  const [selectedTime, setSelectedTime] = useState("")
+  const [selectedDate, setSelectedDate] = useState<Date>()
+  const [formData, setFormData] = useState({
+    service: "",
+    date: "",
+    time: "",
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    notes: "",
+  })
 
-  const services = [
-    { value: "cleaning", label: "House Cleaning - $60/hour", price: 60 },
-    { value: "cooking", label: "Meal Preparation - $50/hour", price: 50 },
-    { value: "combo", label: "Cooking + Cleaning Combo - $75/hour", price: 75 },
-    { value: "massage-60", label: "Wellness Massage (60 min) - $100", price: 100 },
-    { value: "massage-30", label: "Wellness Massage (30 min) - $50", price: 50 },
-  ]
-
-  const timeSlots = [
-    "9:00 AM",
-    "10:00 AM",
-    "11:00 AM",
-    "12:00 PM",
-    "1:00 PM",
-    "2:00 PM",
-    "3:00 PM",
-    "4:00 PM",
-    "5:00 PM",
-  ]
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    console.log("Booking submitted:", formData)
+    // Handle form submission here
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900">
-      <Navigation />
-
-      {/* Contact Button */}
-      <div className="absolute top-8 left-8 z-10">
-        <div className="flex items-center gap-3">
-          <Button
-            asChild
-            className="bg-blue-400 hover:bg-blue-500 text-slate-800 px-4 py-3 rounded-lg font-bold text-sm border-2 border-blue-500 flex items-center gap-2"
-          >
-            <Link href="/contact">
-              <Phone className="w-4 h-4" />
-              CONTACT@SERENITY.CO
-            </Link>
-          </Button>
-        </div>
-
-        <div className="mt-4 bg-slate-800/90 backdrop-blur-sm border-2 border-blue-400 rounded-lg p-4 max-w-[200px]">
-          <div className="text-blue-300 font-bold text-lg mb-2">CONTACT</div>
-          <div className="w-8 h-8 border-2 border-blue-400 rounded flex items-center justify-center mb-2">
-            <Phone className="w-4 h-4 text-blue-400" />
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 font-manrope">
+      {/* Header */}
+      <div className="bg-white/80 backdrop-blur-sm border-b border-orange-200">
+        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button asChild variant="ghost" size="sm">
+              <Link href="/" className="text-orange-600 hover:text-orange-700">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Home
+              </Link>
+            </Button>
+            <div>
+              <h1 className="text-2xl font-bold text-orange-600">Book a Service</h1>
+              <p className="text-orange-500 text-sm">Schedule your appointment</p>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Main Brand Name */}
-      <div className="text-center pt-20 mb-12">
-        <h1 className="text-6xl md:text-8xl font-black text-blue-400 tracking-wider mb-4 drop-shadow-2xl">SERENITY</h1>
-        <h2 className="text-2xl md:text-3xl font-bold text-lavender-400 tracking-wide">BOOK YOUR SERVICE</h2>
-      </div>
+      {/* Booking Form */}
+      <div className="max-w-2xl mx-auto px-6 py-12">
+        <Card className="bg-white/90 backdrop-blur-sm border-orange-200">
+          <CardHeader>
+            <CardTitle className="text-xl text-gray-800">Service Booking</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Service Selection */}
+              <div className="space-y-2">
+                <Label htmlFor="service">Select Service</Label>
+                <Select
+                  value={formData.service}
+                  onValueChange={(value) => setFormData({ ...formData, service: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choose a service" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {services.map((service) => (
+                      <SelectItem key={service.id} value={service.id}>
+                        {service.name} - {service.price}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          <Card className="bg-slate-800/80 backdrop-blur-sm border-2 border-blue-400/50">
-            <CardHeader>
-              <CardTitle className="text-2xl text-center text-white">Schedule Your Appointment</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-8">
-              <form className="space-y-6">
-                {/* Service Selection */}
+              {/* Date Selection */}
+              <div className="space-y-2">
+                <Label>Select Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full justify-start text-left font-normal bg-transparent">
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {selectedDate ? format(selectedDate, "PPP") : "Pick a date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={setSelectedDate}
+                      disabled={(date) => date < new Date()}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {/* Time Selection */}
+              <div className="space-y-2">
+                <Label htmlFor="time">Select Time</Label>
+                <Select value={formData.time} onValueChange={(value) => setFormData({ ...formData, time: value })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choose a time" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {timeSlots.map((time) => (
+                      <SelectItem key={time} value={time}>
+                        <div className="flex items-center">
+                          <Clock className="w-4 h-4 mr-2" />
+                          {time}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Personal Information */}
+              <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="service" className="text-lg font-semibold text-blue-300">
-                    Select Service
-                  </Label>
-                  <Select value={selectedService} onValueChange={setSelectedService}>
-                    <SelectTrigger className="w-full p-4 text-lg border-blue-400/50 bg-slate-700 text-white">
-                      <SelectValue placeholder="Choose your service..." />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-800 border-blue-400/50">
-                      {services.map((service) => (
-                        <SelectItem
-                          key={service.value}
-                          value={service.value}
-                          className="text-lg p-3 text-white hover:bg-slate-700"
-                        >
-                          {service.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Date and Time Selection */}
-                <div className="grid md:grid-cols-2 gap-8">
-                  <div className="space-y-2">
-                    <Label className="text-lg font-semibold text-blue-300">Select Date</Label>
-                    <div className="flex justify-center">
-                      <Calendar
-                        mode="single"
-                        selected={selectedDate}
-                        onSelect={setSelectedDate}
-                        className="rounded-md border border-blue-400/50 bg-slate-700 text-white"
-                        disabled={(date) => date < new Date()}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="time" className="text-lg font-semibold text-blue-300">
-                        Select Time
-                      </Label>
-                      <Select value={selectedTime} onValueChange={setSelectedTime}>
-                        <SelectTrigger className="w-full p-4 text-lg border-blue-400/50 bg-slate-700 text-white">
-                          <SelectValue placeholder="Choose time..." />
-                        </SelectTrigger>
-                        <SelectContent className="bg-slate-800 border-blue-400/50">
-                          {timeSlots.map((time) => (
-                            <SelectItem key={time} value={time} className="text-lg p-3 text-white hover:bg-slate-700">
-                              {time}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {/* Contact Information */}
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="name" className="text-lg font-semibold text-blue-300">
-                          Full Name
-                        </Label>
-                        <Input
-                          id="name"
-                          placeholder="Enter your full name"
-                          className="p-4 text-lg border-blue-400/50 bg-slate-700 text-white placeholder:text-gray-400"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="phone" className="text-lg font-semibold text-blue-300">
-                          Phone Number
-                        </Label>
-                        <Input
-                          id="phone"
-                          type="tel"
-                          placeholder="Enter your phone number"
-                          className="p-4 text-lg border-blue-400/50 bg-slate-700 text-white placeholder:text-gray-400"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="email" className="text-lg font-semibold text-blue-300">
-                          Email Address
-                        </Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          placeholder="Enter your email"
-                          className="p-4 text-lg border-blue-400/50 bg-slate-700 text-white placeholder:text-gray-400"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Address */}
-                <div className="space-y-2">
-                  <Label htmlFor="address" className="text-lg font-semibold text-blue-300">
-                    Service Address
-                  </Label>
-                  <Textarea
-                    id="address"
-                    placeholder="Enter the address where service will be provided"
-                    className="p-4 text-lg border-blue-400/50 bg-slate-700 text-white placeholder:text-gray-400 min-h-[100px]"
+                  <Label htmlFor="name">Full Name</Label>
+                  <Input
+                    id="name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    required
                   />
                 </div>
-
-                {/* Special Requests */}
                 <div className="space-y-2">
-                  <Label htmlFor="notes" className="text-lg font-semibold text-blue-300">
-                    Special Requests or Notes (Optional)
-                  </Label>
-                  <Textarea
-                    id="notes"
-                    placeholder="Any special instructions or requests..."
-                    className="p-4 text-lg border-blue-400/50 bg-slate-700 text-white placeholder:text-gray-400 min-h-[100px]"
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    required
                   />
                 </div>
+              </div>
 
-                {/* Booking Summary */}
-                {selectedService && selectedDate && selectedTime && (
-                  <Card className="bg-lavender-500/20 border-lavender-400/50">
-                    <CardContent className="p-6">
-                      <h3 className="text-xl font-semibold text-white mb-4">Booking Summary</h3>
-                      <div className="space-y-2 text-gray-300">
-                        <p>
-                          <strong>Service:</strong> {services.find((s) => s.value === selectedService)?.label}
-                        </p>
-                        <p>
-                          <strong>Date:</strong> {selectedDate?.toLocaleDateString()}
-                        </p>
-                        <p>
-                          <strong>Time:</strong> {selectedTime}
-                        </p>
-                        <p className="text-lg font-semibold text-lavender-400">
-                          <strong>Price:</strong> ${services.find((s) => s.value === selectedService)?.price}
-                          {selectedService.includes("massage") ? "" : "/hour"}
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone Number</Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  required
+                />
+              </div>
 
-                {/* Submit Button */}
-                <div className="text-center pt-6">
-                  <Button
-                    type="submit"
-                    size="lg"
-                    className="bg-lavender-500 hover:bg-lavender-600 text-white px-12 py-4 text-xl font-bold"
-                  >
-                    Confirm Booking
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+              <div className="space-y-2">
+                <Label htmlFor="address">Service Address</Label>
+                <Textarea
+                  id="address"
+                  value={formData.address}
+                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                  placeholder="Enter your full address"
+                  required
+                />
+              </div>
 
-      {/* Bottom Text */}
-      <div className="text-center pb-12">
-        <h2 className="text-4xl md:text-6xl font-black text-lavender-400 tracking-wider drop-shadow-2xl">WELLNESS</h2>
-      </div>
+              <div className="space-y-2">
+                <Label htmlFor="notes">Special Notes (Optional)</Label>
+                <Textarea
+                  id="notes"
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  placeholder="Any special requests or notes"
+                />
+              </div>
 
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-10 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-400 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-lavender-400 rounded-full blur-3xl"></div>
+              <Button type="submit" className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3">
+                Book Service
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )

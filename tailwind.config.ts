@@ -19,6 +19,9 @@ const config: Config = {
       },
     },
     extend: {
+      fontFamily: {
+        manrope: ["var(--font-manrope)", "sans-serif"],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -52,31 +55,6 @@ const config: Config = {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
-        },
-        // Custom colors for the cleaning business
-        lavender: {
-          50: "#f8f7ff",
-          100: "#f0edff",
-          200: "#e4deff",
-          300: "#d1c4ff",
-          400: "#b8a0ff",
-          500: "#9d78ff",
-          600: "#8b5cf6",
-          700: "#7c3aed",
-          800: "#6d28d9",
-          900: "#5b21b6",
-        },
-        blue: {
-          50: "#eff6ff",
-          100: "#dbeafe",
-          200: "#bfdbfe",
-          300: "#93c5fd",
-          400: "#60a5fa",
-          500: "#3b82f6",
-          600: "#2563eb",
-          700: "#1d4ed8",
-          800: "#1e40af",
-          900: "#1e3a8a",
         },
       },
       borderRadius: {

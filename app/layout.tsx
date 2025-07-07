@@ -1,10 +1,18 @@
-import type { Metadata } from 'next'
-import './globals.css'
+import type React from "react"
+import type { Metadata } from "next"
+import { Manrope } from "next/font/google"
+import "./globals.css"
+
+const manrope = Manrope({
+  subsets: ["latin"],
+  variable: "--font-manrope",
+})
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
-  generator: 'v0.dev',
+  title: "Serenity Services - Professional Cleaning & Wellness",
+  description:
+    "Professional cleaning and wellness services for your home. House cleaning, meal preparation, and therapeutic massage services.",
+  generator: "v0.dev",
 }
 
 export default function RootLayout({
@@ -14,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className={`${manrope.variable} font-manrope`}>{children}</body>
     </html>
   )
 }

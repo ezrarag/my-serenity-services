@@ -1,145 +1,145 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Navigation } from "@/components/navigation"
-import { Heart, Shield, Star, Users, Phone } from "lucide-react"
+import { ArrowLeft, Heart, Shield, Star, Users } from "lucide-react"
+
+const values = [
+  {
+    icon: Heart,
+    title: "Care & Compassion",
+    description: "We treat every home and client with the utmost care and respect.",
+  },
+  {
+    icon: Shield,
+    title: "Trust & Reliability",
+    description: "Fully insured and bonded professionals you can depend on.",
+  },
+  {
+    icon: Star,
+    title: "Quality Excellence",
+    description: "We maintain the highest standards in all our services.",
+  },
+  {
+    icon: Users,
+    title: "Personal Touch",
+    description: "Customized services tailored to your unique needs.",
+  },
+]
+
+const team = [
+  {
+    name: "Sarah Johnson",
+    role: "Founder & CEO",
+    image: "/placeholder.svg?height=200&width=200&text=Sarah",
+    bio: "With 10+ years in hospitality, Sarah founded Serenity Services to bring professional care to every home.",
+  },
+  {
+    name: "Michael Chen",
+    role: "Head of Operations",
+    image: "/placeholder.svg?height=200&width=200&text=Michael",
+    bio: "Michael ensures our team delivers consistent, high-quality service across all locations.",
+  },
+  {
+    name: "Emma Rodriguez",
+    role: "Wellness Specialist",
+    image: "/placeholder.svg?height=200&width=200&text=Emma",
+    bio: "Licensed massage therapist with expertise in therapeutic and relaxation techniques.",
+  },
+]
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900">
-      <Navigation />
-
-      {/* Contact Button */}
-      <div className="absolute top-8 left-8 z-10">
-        <div className="flex items-center gap-3">
-          <Button
-            asChild
-            className="bg-blue-400 hover:bg-blue-500 text-slate-800 px-4 py-3 rounded-lg font-bold text-sm border-2 border-blue-500 flex items-center gap-2"
-          >
-            <Link href="/contact">
-              <Phone className="w-4 h-4" />
-              CONTACT@SERENITY.CO
-            </Link>
-          </Button>
-        </div>
-
-        <div className="mt-4 bg-slate-800/90 backdrop-blur-sm border-2 border-blue-400 rounded-lg p-4 max-w-[200px]">
-          <div className="text-blue-300 font-bold text-lg mb-2">CONTACT</div>
-          <div className="w-8 h-8 border-2 border-blue-400 rounded flex items-center justify-center mb-2">
-            <Phone className="w-4 h-4 text-blue-400" />
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 font-manrope">
+      {/* Header */}
+      <div className="bg-white/80 backdrop-blur-sm border-b border-orange-200">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button asChild variant="ghost" size="sm">
+              <Link href="/" className="text-orange-600 hover:text-orange-700">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Home
+              </Link>
+            </Button>
+            <div>
+              <h1 className="text-2xl font-bold text-orange-600">About Us</h1>
+              <p className="text-orange-500 text-sm">Learn about our story and values</p>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Main Brand Name */}
-      <div className="text-center pt-20 mb-12">
-        <h1 className="text-6xl md:text-8xl font-black text-blue-400 tracking-wider mb-4 drop-shadow-2xl">SERENITY</h1>
-        <h2 className="text-2xl md:text-3xl font-bold text-lavender-400 tracking-wide">WHO ARE WE?</h2>
-      </div>
+      <div className="max-w-6xl mx-auto px-6 py-12">
+        {/* Hero Section */}
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-bold text-gray-800 mb-6">Bringing Serenity to Your Home</h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            At Serenity Services, we believe that everyone deserves a clean, comfortable home and moments of wellness in
+            their busy lives. Founded in 2020, we've been dedicated to providing exceptional cleaning and wellness
+            services that give you more time for what matters most.
+          </p>
+        </div>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto space-y-12">
-          {/* Our Story */}
-          <Card className="bg-slate-800/80 backdrop-blur-sm border-2 border-blue-400/50">
-            <CardContent className="p-8">
-              <h2 className="text-3xl font-bold text-white mb-6">Our Story</h2>
-              <p className="text-lg text-gray-300 leading-relaxed mb-4">
-                Founded with a passion for creating peaceful, clean environments, Serenity Cleaning & Wellness combines
-                professional cleaning services with therapeutic wellness treatments. We believe that a clean home and a
-                relaxed mind go hand in hand.
-              </p>
-              <p className="text-lg text-gray-300 leading-relaxed">
-                Our team consists of certified cleaning professionals and licensed massage therapists who are dedicated
-                to providing exceptional service with attention to detail and care for your well-being.
-              </p>
-            </CardContent>
-          </Card>
-
-          {/* Our Values */}
-          <div className="grid md:grid-cols-2 gap-8">
-            <Card className="bg-slate-800/80 backdrop-blur-sm border-2 border-blue-400/50">
-              <CardContent className="p-6 text-center">
-                <div className="bg-blue-400/20 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                  <Shield className="w-8 h-8 text-blue-400" />
-                </div>
-                <h3 className="text-xl font-semibold text-white mb-3">Trusted & Reliable</h3>
-                <p className="text-gray-300">
-                  All our team members are background-checked, insured, and trained to the highest standards.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-slate-800/80 backdrop-blur-sm border-2 border-lavender-400/50">
-              <CardContent className="p-6 text-center">
-                <div className="bg-lavender-400/20 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                  <Heart className="w-8 h-8 text-lavender-400" />
-                </div>
-                <h3 className="text-xl font-semibold text-white mb-3">Care & Compassion</h3>
-                <p className="text-gray-300">
-                  We treat every home and client with the utmost care and respect, as if it were our own family.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-slate-800/80 backdrop-blur-sm border-2 border-lavender-400/50">
-              <CardContent className="p-6 text-center">
-                <div className="bg-lavender-400/20 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                  <Star className="w-8 h-8 text-lavender-400" />
-                </div>
-                <h3 className="text-xl font-semibold text-white mb-3">Excellence</h3>
-                <p className="text-gray-300">
-                  We strive for perfection in every service, ensuring your complete satisfaction every time.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-slate-800/80 backdrop-blur-sm border-2 border-blue-400/50">
-              <CardContent className="p-6 text-center">
-                <div className="bg-blue-400/20 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                  <Users className="w-8 h-8 text-blue-400" />
-                </div>
-                <h3 className="text-xl font-semibold text-white mb-3">Community Focused</h3>
-                <p className="text-gray-300">
-                  We're proud to serve our local community and build lasting relationships with our clients.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Call to Action */}
-          <div className="text-center">
-            <Card className="bg-gradient-to-r from-blue-500/80 to-lavender-500/80 backdrop-blur-sm border-2 border-blue-400/50">
-              <CardContent className="p-8">
-                <h2 className="text-3xl font-bold mb-4 text-white">Ready to Experience Serenity?</h2>
-                <p className="text-xl mb-6 text-gray-200">Let us bring peace and cleanliness to your home today.</p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Button asChild size="lg" className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 font-bold">
-                    <Link href="/services">View Our Services</Link>
-                  </Button>
-                  <Button
-                    asChild
-                    size="lg"
-                    variant="outline"
-                    className="border-white text-white hover:bg-white hover:text-blue-600 px-8 py-3 bg-transparent font-bold"
-                  >
-                    <Link href="/booking">Book Now</Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+        {/* Values Section */}
+        <div className="mb-16">
+          <h3 className="text-3xl font-bold text-gray-800 text-center mb-12">Our Values</h3>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {values.map((value, index) => {
+              const IconComponent = value.icon
+              return (
+                <Card key={index} className="bg-white/90 backdrop-blur-sm border-orange-200 text-center">
+                  <CardContent className="p-6">
+                    <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <IconComponent className="w-8 h-8 text-orange-600" />
+                    </div>
+                    <h4 className="font-semibold text-gray-800 mb-2">{value.title}</h4>
+                    <p className="text-gray-600 text-sm">{value.description}</p>
+                  </CardContent>
+                </Card>
+              )
+            })}
           </div>
         </div>
-      </div>
 
-      {/* Bottom Text */}
-      <div className="text-center pb-12">
-        <h2 className="text-4xl md:text-6xl font-black text-lavender-400 tracking-wider drop-shadow-2xl">WELLNESS</h2>
-      </div>
+        {/* Team Section */}
+        <div className="mb-16">
+          <h3 className="text-3xl font-bold text-gray-800 text-center mb-12">Meet Our Team</h3>
+          <div className="grid md:grid-cols-3 gap-8">
+            {team.map((member, index) => (
+              <Card key={index} className="bg-white/90 backdrop-blur-sm border-orange-200">
+                <CardContent className="p-6 text-center">
+                  <img
+                    src={member.image || "/placeholder.svg"}
+                    alt={member.name}
+                    className="w-32 h-32 rounded-full mx-auto mb-4 object-cover"
+                  />
+                  <h4 className="font-semibold text-gray-800 text-lg mb-1">{member.name}</h4>
+                  <p className="text-orange-600 font-medium mb-3">{member.role}</p>
+                  <p className="text-gray-600 text-sm">{member.bio}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
 
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-10 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-400 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-lavender-400 rounded-full blur-3xl"></div>
+        {/* CTA Section */}
+        <div className="text-center bg-white/90 backdrop-blur-sm border border-orange-200 rounded-lg p-12">
+          <h3 className="text-3xl font-bold text-gray-800 mb-4">Ready to Experience Serenity?</h3>
+          <p className="text-gray-600 text-lg mb-8 max-w-2xl mx-auto">
+            Join hundreds of satisfied customers who trust us with their home care and wellness needs.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button asChild className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3">
+              <Link href="/booking">Book a Service</Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              className="border-orange-400 text-orange-600 hover:bg-orange-50 px-8 py-3 bg-transparent"
+            >
+              <Link href="/contact">Contact Us</Link>
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   )
