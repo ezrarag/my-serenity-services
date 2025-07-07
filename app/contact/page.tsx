@@ -1,135 +1,96 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowLeft, Phone, Mail, MapPin, Clock } from "lucide-react"
 
 export default function ContactPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 font-manrope">
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-orange-200">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button asChild variant="ghost" size="sm">
-              <Link href="/" className="text-orange-600 hover:text-orange-700">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Home
-              </Link>
-            </Button>
-            <div>
-              <h1 className="text-2xl font-bold text-orange-600">Contact Us</h1>
-              <p className="text-orange-500 text-sm">Get in touch with our team</p>
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-8">
+          <Button asChild variant="ghost" size="icon">
+            <Link href="/">
+              <ArrowLeft className="w-5 h-5" />
+            </Link>
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold text-orange-600">Contact Us</h1>
+            <p className="text-orange-500">Get in touch with Serenity Services</p>
           </div>
         </div>
-      </div>
 
-      <div className="max-w-6xl mx-auto px-6 py-12">
-        <div className="grid lg:grid-cols-2 gap-12">
+        <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Contact Information */}
-          <div className="space-y-8">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-800 mb-4">Get in Touch</h2>
-              <p className="text-gray-600 text-lg">
-                We're here to help you with all your cleaning and wellness needs. Reach out to us anytime!
-              </p>
-            </div>
-
-            <div className="space-y-6">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <Phone className="w-6 h-6 text-orange-600" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-800 mb-1">Phone</h3>
-                  <p className="text-gray-600">(555) 123-4567</p>
-                  <p className="text-sm text-gray-500">Available 24/7 for emergencies</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <Mail className="w-6 h-6 text-orange-600" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-800 mb-1">Email</h3>
-                  <p className="text-gray-600">contact@serenityservices.com</p>
-                  <p className="text-sm text-gray-500">We'll respond within 24 hours</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <MapPin className="w-6 h-6 text-orange-600" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-800 mb-1">Service Area</h3>
-                  <p className="text-gray-600">Greater Metropolitan Area</p>
-                  <p className="text-sm text-gray-500">Within 25 miles of downtown</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <Clock className="w-6 h-6 text-orange-600" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-800 mb-1">Hours</h3>
-                  <p className="text-gray-600">Monday - Friday: 8 AM - 8 PM</p>
-                  <p className="text-gray-600">Saturday - Sunday: 9 AM - 6 PM</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Contact Form */}
-          <Card className="bg-white/90 backdrop-blur-sm border-orange-200">
+          <Card className="border-orange-200">
             <CardHeader>
-              <CardTitle className="text-xl text-gray-800">Send us a Message</CardTitle>
+              <CardTitle className="text-orange-600">Get In Touch</CardTitle>
+              <CardDescription>We're here to help with all your service needs</CardDescription>
             </CardHeader>
-            <CardContent>
-              <form className="space-y-4">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">First Name</Label>
-                    <Input id="firstName" required />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">Last Name</Label>
-                    <Input id="lastName" required />
-                  </div>
+            <CardContent className="space-y-6">
+              <div className="flex items-center gap-3">
+                <Phone className="w-5 h-5 text-orange-500" />
+                <div>
+                  <p className="font-medium">Phone</p>
+                  <p className="text-gray-600">(555) 123-4567</p>
                 </div>
+              </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" required />
+              <div className="flex items-center gap-3">
+                <Mail className="w-5 h-5 text-orange-500" />
+                <div>
+                  <p className="font-medium">Email</p>
+                  <p className="text-gray-600">contact@serenity.co</p>
                 </div>
+              </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Phone Number</Label>
-                  <Input id="phone" type="tel" />
+              <div className="flex items-center gap-3">
+                <MapPin className="w-5 h-5 text-orange-500" />
+                <div>
+                  <p className="font-medium">Service Area</p>
+                  <p className="text-gray-600">Greater Metropolitan Area</p>
                 </div>
+              </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="subject">Subject</Label>
-                  <Input id="subject" placeholder="How can we help you?" required />
+              <div className="flex items-center gap-3">
+                <Clock className="w-5 h-5 text-orange-500" />
+                <div>
+                  <p className="font-medium">Hours</p>
+                  <p className="text-gray-600">Mon-Fri: 8AM-6PM</p>
+                  <p className="text-gray-600">Sat-Sun: 9AM-5PM</p>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
 
-                <div className="space-y-2">
-                  <Label htmlFor="message">Message</Label>
-                  <Textarea
-                    id="message"
-                    placeholder="Tell us more about your needs..."
-                    className="min-h-[120px]"
-                    required
-                  />
-                </div>
+          {/* Quick Actions */}
+          <Card className="border-orange-200">
+            <CardHeader>
+              <CardTitle className="text-orange-600">Quick Actions</CardTitle>
+              <CardDescription>Ready to get started?</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Button asChild className="w-full bg-orange-500 hover:bg-orange-600 text-white">
+                <Link href="/booking">Book a Service</Link>
+              </Button>
 
-                <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white">Send Message</Button>
-              </form>
+              <Button
+                asChild
+                variant="outline"
+                className="w-full border-orange-400 text-orange-600 hover:bg-orange-50 bg-transparent"
+              >
+                <Link href="/services">View All Services</Link>
+              </Button>
+
+              <div className="pt-4 border-t border-orange-200">
+                <h3 className="font-semibold text-orange-600 mb-2">Emergency Services</h3>
+                <p className="text-sm text-gray-600 mb-3">
+                  Need immediate assistance? We offer emergency cleaning and wellness services.
+                </p>
+                <Button variant="outline" className="w-full border-red-400 text-red-600 hover:bg-red-50 bg-transparent">
+                  Emergency Contact
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>

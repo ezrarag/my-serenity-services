@@ -1,126 +1,99 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowLeft, Home, ChefHat, Heart, Sparkles } from "lucide-react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { ArrowLeft } from "lucide-react"
 
 const services = [
   {
-    id: "cleaning",
     title: "House Cleaning",
     price: "$60/hour",
     description: "Professional deep cleaning for your home including all rooms, bathrooms, and kitchen.",
-    features: ["Deep cleaning", "Eco-friendly products", "Flexible scheduling", "Insured staff"],
-    icon: Home,
-    color: "bg-blue-100 text-blue-600",
+    features: ["Deep cleaning", "All rooms included", "Eco-friendly products", "Flexible scheduling"],
+    image:
+      "https://gfqhzuqckfxtzqawdcso.supabase.co/storage/v1/object/public/usethisfornow/myserenityservices/IMG_0042.png",
   },
   {
-    id: "cooking",
     title: "Meal Preparation",
     price: "$50/hour",
     description: "Healthy meal prep and cooking services tailored to your dietary preferences.",
-    features: ["Custom meal plans", "Fresh ingredients", "Dietary accommodations", "Weekly prep"],
-    icon: ChefHat,
-    color: "bg-green-100 text-green-600",
+    features: ["Custom meal planning", "Fresh ingredients", "Dietary accommodations", "Weekly prep available"],
+    image:
+      "https://gfqhzuqckfxtzqawdcso.supabase.co/storage/v1/object/public/usethisfornow/myserenityservices/IMG_1548.png",
   },
   {
-    id: "combo",
-    title: "Cleaning + Cooking",
+    title: "Cleaning + Cooking Combo",
     price: "$75/hour",
-    description: "Complete home care package combining cleaning and meal preparation services.",
-    features: ["Best value", "Complete home care", "Time saving", "Coordinated service"],
-    icon: Sparkles,
-    color: "bg-purple-100 text-purple-600",
-    popular: true,
+    description: "Complete home care package combining our cleaning and cooking services.",
+    features: ["House cleaning", "Meal preparation", "Time efficient", "Best value package"],
+    image:
+      "https://gfqhzuqckfxtzqawdcso.supabase.co/storage/v1/object/public/usethisfornow/myserenityservices/IMG_4430.png",
   },
   {
-    id: "massage-60",
-    title: "Full Body Massage (60 min)",
-    price: "$100",
-    description: "Relaxing therapeutic massage to relieve stress and muscle tension.",
-    features: ["60 minutes", "Full body", "Therapeutic oils", "Stress relief"],
-    icon: Heart,
-    color: "bg-pink-100 text-pink-600",
+    title: "Full Body Massage",
+    price: "$100 for 60 minutes",
+    description: "Therapeutic full-body massage to help you relax and rejuvenate.",
+    features: ["60-minute session", "Professional therapist", "Relaxing environment", "Stress relief"],
+    image:
+      "https://gfqhzuqckfxtzqawdcso.supabase.co/storage/v1/object/public/usethisfornow/myserenityservices/IMG_0042.png",
   },
   {
-    id: "massage-30",
-    title: "Express Massage (30 min)",
-    price: "$50",
+    title: "Express Massage",
+    price: "$50 for 30 minutes",
     description: "Quick relaxation massage perfect for busy schedules.",
-    features: ["30 minutes", "Targeted areas", "Quick relief", "Flexible timing"],
-    icon: Heart,
-    color: "bg-orange-100 text-orange-600",
+    features: ["30-minute session", "Targeted relief", "Quick booking", "Affordable option"],
+    image:
+      "https://gfqhzuqckfxtzqawdcso.supabase.co/storage/v1/object/public/usethisfornow/myserenityservices/IMG_1548.png",
   },
 ]
 
 export default function ServicesPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 font-manrope">
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-orange-200">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button asChild variant="ghost" size="sm">
-              <Link href="/" className="text-orange-600 hover:text-orange-700">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Home
-              </Link>
-            </Button>
-            <div>
-              <h1 className="text-2xl font-bold text-orange-600">Our Services</h1>
-              <p className="text-orange-500 text-sm">Professional cleaning and wellness services</p>
-            </div>
-          </div>
-          <Button asChild className="bg-orange-500 hover:bg-orange-600 text-white">
-            <Link href="/booking">Book Now</Link>
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-8">
+          <Button asChild variant="ghost" size="icon">
+            <Link href="/">
+              <ArrowLeft className="w-5 h-5" />
+            </Link>
           </Button>
+          <div>
+            <h1 className="text-3xl font-bold text-orange-600">Our Services</h1>
+            <p className="text-orange-500">Professional cleaning and wellness services</p>
+          </div>
         </div>
-      </div>
 
-      {/* Services Grid */}
-      <div className="max-w-6xl mx-auto px-6 py-12">
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {services.map((service) => {
-            const IconComponent = service.icon
-            return (
-              <Card
-                key={service.id}
-                className={`relative bg-white/90 backdrop-blur-sm border-orange-200 hover:shadow-lg transition-shadow ${
-                  service.popular ? "ring-2 ring-orange-400" : ""
-                }`}
-              >
-                {service.popular && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-medium">
-                      Most Popular
-                    </span>
-                  </div>
-                )}
-                <CardHeader>
-                  <div className="flex items-center justify-between mb-2">
-                    <div className={`w-12 h-12 rounded-lg ${service.color} flex items-center justify-center`}>
-                      <IconComponent className="w-6 h-6" />
-                    </div>
-                    <span className="text-2xl font-bold text-orange-600">{service.price}</span>
-                  </div>
-                  <CardTitle className="text-xl text-gray-800">{service.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 mb-4">{service.description}</p>
-                  <ul className="space-y-2 mb-6">
-                    {service.features.map((feature, index) => (
-                      <li key={index} className="flex items-center text-sm text-gray-600">
-                        <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mr-3" />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                  <Button asChild className="w-full bg-orange-500 hover:bg-orange-600 text-white">
-                    <Link href={`/booking?service=${service.id}`}>Book This Service</Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            )
-          })}
+        {/* Services Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {services.map((service, index) => (
+            <Card key={index} className="border-orange-200 hover:shadow-lg transition-shadow">
+              <div className="aspect-video overflow-hidden rounded-t-lg">
+                <img
+                  src={service.image || "/placeholder.svg"}
+                  alt={service.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <CardHeader>
+                <CardTitle className="text-orange-600">{service.title}</CardTitle>
+                <CardDescription className="text-orange-500 font-semibold text-lg">{service.price}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 mb-4">{service.description}</p>
+                <ul className="space-y-1 mb-4">
+                  {service.features.map((feature, idx) => (
+                    <li key={idx} className="text-sm text-gray-500 flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-orange-400 rounded-full"></div>
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+                <Button asChild className="w-full bg-orange-500 hover:bg-orange-600 text-white">
+                  <Link href="/booking">Book This Service</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
     </div>
