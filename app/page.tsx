@@ -27,7 +27,7 @@ const services: ServiceCard[] = [
     title: "MEAL PREPARATION",
     subtitle: "Healthy meal prep services",
     image:
-      "https://gfqhzuqckfxtzqawdcso.supabase.co/storage/v1/object/public/usethisfornow/myserenityservices/IMG_1548.png",
+      "https://gfqhzuqckfxtzqawdcso.supabase.co/storage/v1/object/public/usethisfornow/myserenityservices/IMG_5529.JPG",
     color: "bg-orange-400",
   },
   {
@@ -35,7 +35,7 @@ const services: ServiceCard[] = [
     title: "CLEANING + COOKING",
     subtitle: "Complete home care package",
     image:
-      "https://gfqhzuqckfxtzqawdcso.supabase.co/storage/v1/object/public/usethisfornow/myserenityservices/IMG_4430.png",
+      "https://gfqhzuqckfxtzqawdcso.supabase.co/storage/v1/object/public/usethisfornow/myserenityservices/IMG_5511.JPG",
     color: "bg-green-400",
   },
   {
