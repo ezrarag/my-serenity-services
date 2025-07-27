@@ -13,6 +13,7 @@ import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { ArrowLeft, CalendarIcon, Clock } from "lucide-react"
 import { format } from "date-fns"
+import { PricingModal } from "@/components/pricing-modal"
 
 const services = [
   { id: "cleaning", name: "House Cleaning", price: "$60/hour" },
@@ -67,7 +68,12 @@ export default function BookingPage() {
           </div>
         </div>
 
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-2xl mx-auto space-y-6">
+          {/* Pricing Modal */}
+          <div className="text-center">
+            <PricingModal />
+          </div>
+          
           <Card className="border-primary">
             <CardHeader>
               <CardTitle className="text-primary">Service Booking</CardTitle>
