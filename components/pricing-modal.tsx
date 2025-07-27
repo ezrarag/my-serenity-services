@@ -8,7 +8,9 @@ import { Badge } from "@/components/ui/badge"
 import { Check, Star, CreditCard } from "lucide-react"
 import { loadStripe } from "@stripe/stripe-js"
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY 
+  ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
+  : null
 
 const pricingPlans = [
   {
@@ -112,6 +114,11 @@ export function PricingModal() {
   const handlePayment = async (plan: typeof pricingPlans[0]) => {
     setIsLoading(true)
     try {
+      if (!stripePromise) {
+        alert('Payment system is not configured. Please contact support.')
+        return
+      }
+
       // Create payment intent
       const response = await fetch('/api/create-payment-intent', {
         method: 'POST',
@@ -131,6 +138,11 @@ export function PricingModal() {
         }),
       })
 
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to create payment')
+      }
+
       const { clientSecret } = await response.json()
 
       // Redirect to Stripe Checkout
@@ -145,10 +157,12 @@ export function PricingModal() {
 
         if (error) {
           console.error('Payment error:', error)
+          alert('Payment failed. Please try again.')
         }
       }
     } catch (error) {
       console.error('Payment processing error:', error)
+      alert('Payment system error. Please contact support.')
     } finally {
       setIsLoading(false)
     }

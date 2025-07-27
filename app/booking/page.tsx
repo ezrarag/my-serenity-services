@@ -14,6 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { ArrowLeft, CalendarIcon, Clock } from "lucide-react"
 import { format } from "date-fns"
 import { PricingModal } from "@/components/pricing-modal"
+import { EnvStatus } from "@/components/env-status"
 
 const services = [
   { id: "cleaning", name: "House Cleaning", price: "$60/hour" },
@@ -69,6 +70,9 @@ export default function BookingPage() {
         </div>
 
         <div className="max-w-2xl mx-auto space-y-6">
+          {/* Environment Status (Development Only) */}
+          <EnvStatus />
+          
           {/* Pricing Modal */}
           <div className="text-center">
             <PricingModal />

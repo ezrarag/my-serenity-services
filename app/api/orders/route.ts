@@ -1,13 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+// Check if Supabase environment variables are available
+if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  console.warn('Supabase environment variables are not set')
+}
+
+const supabase = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY
+  ? createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    )
+  : null
 
 export async function POST(request: NextRequest) {
   try {
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Database is not configured' },
+        { status: 500 }
+      )
+    }
+
     const { customerDetails, service, amount, paymentIntentId, scheduledDate, scheduledTime } = await request.json()
 
     const { data, error } = await supabase
@@ -49,6 +63,13 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Database is not configured' },
+        { status: 500 }
+      )
+    }
+
     const { searchParams } = new URL(request.url)
     const email = searchParams.get('email')
 
