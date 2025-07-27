@@ -49,11 +49,15 @@ export function EnvStatus() {
       }
     }
 
-    checkEnv()
+    // Only run in development
+    if (process.env.NODE_ENV === 'development') {
+      checkEnv()
+    }
   }, [])
 
-  if (process.env.NODE_ENV === 'production') {
-    return null // Don't show in production
+  // Don't render anything in production or during build
+  if (process.env.NODE_ENV === 'production' || typeof window === 'undefined') {
+    return null
   }
 
   return (

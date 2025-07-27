@@ -71,7 +71,7 @@ export default function BookingPage() {
 
         <div className="max-w-2xl mx-auto space-y-6">
           {/* Environment Status (Development Only) */}
-          <EnvStatus />
+          {process.env.NODE_ENV === 'development' && <EnvStatus />}
           
           {/* Pricing Modal */}
           <div className="text-center">
