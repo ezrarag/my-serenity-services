@@ -76,9 +76,9 @@ export default function ServiceCarousel() {
 
       {/* title / subtitle / button */}
       <div className="mt-6 text-center space-y-3">
-        <h2 className="text-sm tracking-widest text-orange-600 uppercase">Service&nbsp;0{current + 1}</h2>
-        <h1 className="text-4xl md:text-5xl font-bold text-orange-700">{services[current].title}</h1>
-        <Button className="border-2 border-orange-600 rounded-full bg-transparent text-orange-600 hover:bg-orange-50 px-8 py-3">
+        <h2 className="text-sm tracking-widest text-primary uppercase">Service&nbsp;0{current + 1}</h2>
+        <h1 className="text-4xl md:text-5xl font-bold text-primary">{services[current].title}</h1>
+        <Button className="border-2 border-primary rounded-full bg-transparent text-primary hover:bg-secondary px-8 py-3">
           Book&nbsp;Now
         </Button>
       </div>
@@ -86,10 +86,10 @@ export default function ServiceCarousel() {
       {/* nav arrows bottom right (small/medium view) */}
       <div className="absolute bottom-6 right-6 flex space-x-2 md:hidden">
         <Button variant="ghost" size="icon" onClick={prev}>
-          <ChevronLeft className="h-6 w-6 text-orange-600" />
+          <ChevronLeft className="h-6 w-6 text-primary" />
         </Button>
         <Button variant="ghost" size="icon" onClick={next}>
-          <ChevronRight className="h-6 w-6 text-orange-600" />
+          <ChevronRight className="h-6 w-6 text-primary" />
         </Button>
       </div>
     </section>
@@ -108,7 +108,7 @@ function SideCard({
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
       onClick={onClick}
-      className="rounded-full overflow-hidden w-20 h-20 sm:w-28 sm:h-28 border-4 border-orange-200 shadow"
+      className="rounded-full overflow-hidden w-20 h-20 sm:w-28 sm:h-28 border-4 border-primary shadow"
     >
       <img src={svc.img || "/placeholder.svg"} alt={svc.title} className="object-cover w-full h-full" />
     </motion.button>

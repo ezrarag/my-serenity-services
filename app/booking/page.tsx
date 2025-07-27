@@ -62,15 +62,15 @@ export default function BookingPage() {
             </Link>
           </Button>
           <div>
-            <h1 className="text-3xl font-bold text-orange-600">Book a Service</h1>
-            <p className="text-orange-500">Schedule your appointment with Serenity Services</p>
+            <h1 className="text-3xl font-bold text-primary">Book a Service</h1>
+            <p className="text-primary">Schedule your appointment with Serenity Services</p>
           </div>
         </div>
 
         <div className="max-w-2xl mx-auto">
-          <Card className="border-orange-200">
+          <Card className="border-primary">
             <CardHeader>
-              <CardTitle className="text-orange-600">Service Booking</CardTitle>
+              <CardTitle className="text-primary">Service Booking</CardTitle>
               <CardDescription>Fill out the form below to schedule your service</CardDescription>
             </CardHeader>
             <CardContent>
@@ -187,7 +187,7 @@ export default function BookingPage() {
                   />
                 </div>
 
-                <Button type="submit" className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3">
+                <Button type="submit" className="w-full bg-primary hover:bg-primary/80 text-white py-3">
                   Book Service
                 </Button>
               </form>

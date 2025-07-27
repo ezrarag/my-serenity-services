@@ -22,14 +22,14 @@ export default function ContactPage() {
 
         <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Contact Information */}
-          <Card className="border-orange-200">
+          <Card className="border-primary">
             <CardHeader>
-              <CardTitle className="text-orange-600">Get In Touch</CardTitle>
+              <CardTitle className="text-primary">Get In Touch</CardTitle>
               <CardDescription>We're here to help with all your service needs</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex items-center gap-3">
-                <Phone className="w-5 h-5 text-orange-500" />
+                <Phone className="w-5 h-5 text-primary" />
                 <div>
                   <p className="font-medium">Phone</p>
                   <p className="text-gray-600">(555) 123-4567</p>
@@ -37,7 +37,7 @@ export default function ContactPage() {
               </div>
 
               <div className="flex items-center gap-3">
-                <Mail className="w-5 h-5 text-orange-500" />
+                <Mail className="w-5 h-5 text-primary" />
                 <div>
                   <p className="font-medium">Email</p>
                   <p className="text-gray-600">contact@serenity.co</p>
@@ -45,7 +45,7 @@ export default function ContactPage() {
               </div>
 
               <div className="flex items-center gap-3">
-                <MapPin className="w-5 h-5 text-orange-500" />
+                <MapPin className="w-5 h-5 text-primary" />
                 <div>
                   <p className="font-medium">Service Area</p>
                   <p className="text-gray-600">Greater Metropolitan Area</p>
@@ -53,7 +53,7 @@ export default function ContactPage() {
               </div>
 
               <div className="flex items-center gap-3">
-                <Clock className="w-5 h-5 text-orange-500" />
+                <Clock className="w-5 h-5 text-primary" />
                 <div>
                   <p className="font-medium">Hours</p>
                   <p className="text-gray-600">Mon-Fri: 8AM-6PM</p>
@@ -64,26 +64,26 @@ export default function ContactPage() {
           </Card>
 
           {/* Quick Actions */}
-          <Card className="border-orange-200">
+          <Card className="border-primary">
             <CardHeader>
-              <CardTitle className="text-orange-600">Quick Actions</CardTitle>
+              <CardTitle className="text-primary">Quick Actions</CardTitle>
               <CardDescription>Ready to get started?</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Button asChild className="w-full bg-orange-500 hover:bg-orange-600 text-white">
+              <Button asChild className="w-full bg-primary hover:bg-primary/80 text-white">
                 <Link href="/booking">Book a Service</Link>
               </Button>
 
               <Button
                 asChild
                 variant="outline"
-                className="w-full border-orange-400 text-orange-600 hover:bg-orange-50 bg-transparent"
+                className="w-full border-primary text-primary hover:bg-secondary bg-transparent"
               >
                 <Link href="/services">View All Services</Link>
               </Button>
 
-              <div className="pt-4 border-t border-orange-200">
-                <h3 className="font-semibold text-orange-600 mb-2">Emergency Services</h3>
+              <div className="pt-4 border-t border-primary">
+                <h3 className="font-semibold text-primary mb-2">Emergency Services</h3>
                 <p className="text-sm text-gray-600 mb-3">
                   Need immediate assistance? We offer emergency cleaning and wellness services.
                 </p>

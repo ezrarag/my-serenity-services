@@ -73,19 +73,19 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 relative overflow-hidden font-sans">
+    <div className="min-h-screen bg-gradient-to-br from-secondary to-primary/30 relative overflow-hidden font-sans">
       {/* Top Left - Brand */}
       <div className="absolute top-6 left-6 md:top-8 md:left-8 z-10">
-        <div className="text-orange-500 text-sm font-medium mb-1">THE SERVICES</div>
-        <h1 className="text-orange-600 text-xl md:text-2xl font-semibold leading-tight">SERENITY SERVICES</h1>
+        <div className="text-primary text-sm font-medium mb-1">THE SERVICES</div>
+        <h1 className="text-primary text-xl md:text-2xl font-semibold leading-tight">SERENITY SERVICES</h1>
       </div>
 
       {/* Top Right - CTA matching screenshot */}
       <div className="absolute top-6 right-6 md:top-8 md:right-8 z-10 flex items-center gap-4 md:gap-6">
-        <div className="text-orange-500 text-sm font-medium">THE SERVICES</div>
+        <div className="text-primary text-sm font-medium">THE SERVICES</div>
         <Button
           asChild
-          className="bg-white border-2 border-orange-400 text-orange-500 hover:bg-orange-50 px-6 md:px-8 py-2 md:py-3 rounded-full font-medium text-sm tracking-wide shadow-sm"
+          className="bg-white border-2 border-primary text-primary hover:bg-secondary px-6 md:px-8 py-2 md:py-3 rounded-full font-medium text-sm tracking-wide shadow-sm"
         >
           <Link href="/booking">START BOOKING</Link>
         </Button>
@@ -103,7 +103,7 @@ export default function HomePage() {
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
           >
             <motion.div
-              className="w-20 h-20 md:w-28 md:h-28 rounded-full border-2 border-orange-300 bg-white shadow-lg overflow-hidden"
+              className="w-20 h-20 md:w-28 md:h-28 rounded-full border-2 border-primary bg-white shadow-lg overflow-hidden"
               layoutId={`card-${prevService.id}`}
             >
               <img
@@ -124,7 +124,7 @@ export default function HomePage() {
               transition={{ type: "spring", stiffness: 200, damping: 20 }}
             >
               <motion.div
-                className="w-64 h-64 md:w-80 md:h-80 rounded-full border-4 border-orange-300 bg-white shadow-2xl mx-auto overflow-hidden"
+                className="w-64 h-64 md:w-80 md:h-80 rounded-full border-4 border-primary bg-white shadow-2xl mx-auto overflow-hidden"
                 layoutId={`card-${currentService.id}`}
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
@@ -173,14 +173,14 @@ export default function HomePage() {
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.5 }}
             >
-              <h2 className="text-orange-600 text-3xl md:text-4xl font-bold mb-3 md:mb-4 tracking-wide">
+              <h2 className="text-primary text-3xl md:text-4xl font-bold mb-3 md:mb-4 tracking-wide">
                 {currentService.title}
               </h2>
-              <p className="text-orange-500 text-base md:text-lg mb-6 md:mb-8 font-medium">{currentService.subtitle}</p>
+              <p className="text-primary text-base md:text-lg mb-6 md:mb-8 font-medium">{currentService.subtitle}</p>
 
               <Button
                 asChild
-                className="bg-white border-2 border-orange-400 text-orange-500 hover:bg-orange-50 px-6 md:px-8 py-2 md:py-3 rounded-full font-medium shadow-sm"
+                className="bg-white border-2 border-primary text-primary hover:bg-secondary px-6 md:px-8 py-2 md:py-3 rounded-full font-medium shadow-sm"
               >
                 <Link href="/booking">BOOK NOW</Link>
               </Button>
@@ -196,7 +196,7 @@ export default function HomePage() {
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
           >
             <motion.div
-              className="w-20 h-20 md:w-28 md:h-28 rounded-full border-2 border-orange-300 bg-white shadow-lg overflow-hidden"
+              className="w-20 h-20 md:w-28 md:h-28 rounded-full border-2 border-primary bg-white shadow-lg overflow-hidden"
               layoutId={`card-${nextService.id}`}
             >
               <img
@@ -213,12 +213,12 @@ export default function HomePage() {
       <div className="absolute bottom-6 left-6 md:bottom-8 md:left-8 z-10">
         <Link
           href="/services"
-          className="text-orange-500 text-sm font-medium hover:text-orange-600 flex items-center gap-2"
+          className="text-primary text-sm font-medium hover:text-primary/80 flex items-center gap-2"
         >
           <div className="flex gap-1">
-            <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
-            <div className="w-2 h-2 bg-orange-300 rounded-full"></div>
-            <div className="w-2 h-2 bg-orange-300 rounded-full"></div>
+            <div className="w-2 h-2 bg-primary rounded-full"></div>
+            <div className="w-2 h-2 bg-primary/70 rounded-full"></div>
+            <div className="w-2 h-2 bg-primary/70 rounded-full"></div>
           </div>
           ALL SERVICES
         </Link>
@@ -228,7 +228,7 @@ export default function HomePage() {
       <div className="absolute bottom-6 right-6 md:bottom-8 md:right-8 z-30">
         <motion.button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="w-12 h-12 rounded-full bg-orange-500 text-white shadow-lg flex items-center justify-center hover:bg-orange-600 transition-colors"
+          className="w-12 h-12 rounded-full bg-primary text-white shadow-lg flex items-center justify-center hover:bg-primary/80 transition-colors"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
         >
@@ -242,7 +242,7 @@ export default function HomePage() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.8, y: 20 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="absolute bottom-16 right-0 bg-white rounded-lg shadow-xl border border-orange-200 p-4 w-64"
+              className="absolute bottom-16 right-0 bg-white rounded-lg shadow-xl border border-primary p-4 w-64"
             >
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold text-gray-800">Notifications</h3>
@@ -251,7 +251,7 @@ export default function HomePage() {
                 </button>
               </div>
               <div className="space-y-2 text-sm text-gray-600">
-                <div className="p-2 bg-orange-50 rounded">
+                <div className="p-2 bg-secondary rounded">
                   <p className="font-medium">Welcome to Serenity!</p>
                   <p className="text-xs text-gray-500">Book your first service today</p>
                 </div>
@@ -272,7 +272,7 @@ export default function HomePage() {
             key={index}
             onClick={() => setCurrentIndex(index)}
             className={`w-2 h-2 rounded-full transition-colors duration-200 ${
-              index === currentIndex ? "bg-orange-500" : "bg-orange-300"
+              index === currentIndex ? "bg-primary" : "bg-primary/40"
             }`}
             whileHover={{ scale: 1.2 }}
             whileTap={{ scale: 0.8 }}
