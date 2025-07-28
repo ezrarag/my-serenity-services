@@ -58,6 +58,8 @@
 - [x] Fixed hamburger menu layout
 - [x] Resolved order creation issues
 - [x] Added individual video URLs for services
+- [x] Fixed Next.js 15 build error with useSearchParams() Suspense boundary
+- [x] Added environment variable check API route
 
 ## 🚧 IN PROGRESS
 
