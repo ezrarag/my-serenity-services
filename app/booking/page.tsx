@@ -1,6 +1,10 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import type React from "react"
+import { useRouter } from "next/navigation"
+import { loadStripe } from "@stripe/stripe-js"
+import { Elements } from "@stripe/react-stripe-js"
+import { PaymentForm } from "@/components/payment-form"
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -11,10 +15,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { ArrowLeft, CalendarIcon, Clock } from "lucide-react"
+import { ArrowLeft, CalendarIcon, Clock, AlertCircle } from "lucide-react"
 import { format } from "date-fns"
 import { PricingModal } from "@/components/pricing-modal"
 import { EnvStatus } from "@/components/env-status"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
 const services = [
   { id: "cleaning", name: "House Cleaning", price: "$60/hour" },
@@ -26,7 +31,11 @@ const services = [
 
 const timeSlots = ["9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"]
 
+// Initialize Stripe
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+
 export default function BookingPage() {
+  const router = useRouter()
   const [selectedService, setSelectedService] = useState("")
   const [selectedDate, setSelectedDate] = useState<Date>()
   const [selectedTime, setSelectedTime] = useState("")
@@ -37,20 +46,190 @@ export default function BookingPage() {
     address: "",
     notes: "",
   })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState("")
+  const [showPayment, setShowPayment] = useState(false)
+  const [paymentIntent, setPaymentIntent] = useState<any>(null)
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const validateForm = () => {
+    if (!selectedService) {
+      setError("Please select a service")
+      return false
+    }
+    if (!selectedDate) {
+      setError("Please select a date")
+      return false
+    }
+    if (!selectedTime) {
+      setError("Please select a time")
+      return false
+    }
+    if (!formData.name.trim()) {
+      setError("Please enter your name")
+      return false
+    }
+    if (!formData.email.trim()) {
+      setError("Please enter your email")
+      return false
+    }
+    if (!formData.phone.trim()) {
+      setError("Please enter your phone number")
+      return false
+    }
+    if (!formData.address.trim()) {
+      setError("Please enter your address")
+      return false
+    }
+    setError("")
+    return true
+  }
+
+  const getServiceAmount = (serviceId: string) => {
+    switch (serviceId) {
+      case "cleaning":
+        return 60
+      case "cooking":
+        return 50
+      case "combo":
+        return 75
+      case "massage-60":
+        return 100
+      case "massage-30":
+        return 50
+      default:
+        return 60
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle form submission
-    console.log("Booking submitted:", {
-      service: selectedService,
-      date: selectedDate,
-      time: selectedTime,
-      ...formData,
-    })
+    
+    if (!validateForm()) {
+      return
+    }
+
+    setIsSubmitting(true)
+    setError("")
+
+    try {
+      // Create payment intent
+      const response = await fetch('/api/create-payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: getServiceAmount(selectedService),
+          service: selectedService,
+          customerDetails: formData,
+        })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to create payment intent')
+      }
+
+      const data = await response.json()
+      
+      console.log('Payment intent response:', data) // Debug log
+      
+      // Check if we have a valid clientSecret
+      if (!data.clientSecret) {
+        console.error('No clientSecret in response:', data) // Debug log
+        throw new Error('Invalid payment intent response')
+      }
+      
+      console.log('Setting payment intent with clientSecret:', data.clientSecret) // Debug log
+      setPaymentIntent(data)
+      setShowPayment(true)
+    } catch (error) {
+      console.error('Error creating payment intent:', error)
+      setError(error instanceof Error ? error.message : 'Failed to initialize payment. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handlePaymentSuccess = async (paymentIntentId: string) => {
+    try {
+      console.log('Payment successful, creating order with paymentIntentId:', paymentIntentId)
+      
+      // Save order to database
+      const orderResponse = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerDetails: formData,
+          service: selectedService,
+          amount: getServiceAmount(selectedService),
+          paymentIntentId: paymentIntentId,
+          scheduledDate: selectedDate?.toISOString().split('T')[0],
+          scheduledTime: selectedTime,
+        })
+      })
+
+      console.log('Order API response status:', orderResponse.status)
+
+      if (!orderResponse.ok) {
+        const errorData = await orderResponse.json()
+        console.error('Order creation failed:', errorData)
+        throw new Error(`Failed to save order: ${errorData.error || 'Unknown error'}`)
+      }
+
+      const orderData = await orderResponse.json()
+      console.log('Order created successfully:', orderData)
+
+      // Redirect to success page
+      router.push(`/success?payment_intent=${paymentIntentId}`)
+    } catch (error) {
+      console.error('Error saving order:', error)
+      setError(error instanceof Error ? error.message : 'Payment successful but failed to save order. Please contact support.')
+    }
+  }
+
+  if (showPayment && paymentIntent) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center gap-4 mb-8">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={() => setShowPayment(false)}
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+            <div>
+              <h1 className="text-3xl font-bold text-primary">Complete Payment</h1>
+              <p className="text-primary">Secure payment powered by Stripe</p>
+            </div>
+          </div>
+
+          <div className="max-w-2xl mx-auto">
+            <Card className="border-primary">
+              <CardHeader>
+                <CardTitle className="text-primary">Payment Details</CardTitle>
+                <CardDescription>
+                  Amount: ${getServiceAmount(selectedService)} - {services.find(s => s.id === selectedService)?.name}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Elements stripe={stripePromise} options={{ clientSecret: paymentIntent.clientSecret }}>
+                  <PaymentForm 
+                    clientSecret={paymentIntent.clientSecret}
+                    onSuccess={handlePaymentSuccess}
+                    onError={(error) => setError(error)}
+                  />
+                </Elements>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -77,6 +256,13 @@ export default function BookingPage() {
           <div className="text-center">
             <PricingModal />
           </div>
+
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
           
           <Card className="border-primary">
             <CardHeader>
@@ -87,7 +273,7 @@ export default function BookingPage() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Service Selection */}
                 <div className="space-y-2">
-                  <Label htmlFor="service">Select Service</Label>
+                  <Label htmlFor="service">Select Service *</Label>
                   <Select value={selectedService} onValueChange={setSelectedService}>
                     <SelectTrigger>
                       <SelectValue placeholder="Choose a service" />
@@ -104,7 +290,7 @@ export default function BookingPage() {
 
                 {/* Date Selection */}
                 <div className="space-y-2">
-                  <Label>Select Date</Label>
+                  <Label>Select Date *</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button variant="outline" className="w-full justify-start text-left font-normal bg-transparent">
@@ -120,7 +306,7 @@ export default function BookingPage() {
 
                 {/* Time Selection */}
                 <div className="space-y-2">
-                  <Label htmlFor="time">Select Time</Label>
+                  <Label htmlFor="time">Select Time *</Label>
                   <Select value={selectedTime} onValueChange={setSelectedTime}>
                     <SelectTrigger>
                       <SelectValue placeholder="Choose a time" />
@@ -141,7 +327,7 @@ export default function BookingPage() {
                 {/* Personal Information */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Full Name</Label>
+                    <Label htmlFor="name">Full Name *</Label>
                     <Input
                       id="name"
                       value={formData.name}
@@ -151,7 +337,7 @@ export default function BookingPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email">Email *</Label>
                     <Input
                       id="email"
                       type="email"
@@ -164,7 +350,7 @@ export default function BookingPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Phone Number</Label>
+                  <Label htmlFor="phone">Phone Number *</Label>
                   <Input
                     id="phone"
                     type="tel"
@@ -176,7 +362,7 @@ export default function BookingPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="address">Service Address</Label>
+                  <Label htmlFor="address">Service Address *</Label>
                   <Input
                     id="address"
                     value={formData.address}
@@ -197,8 +383,12 @@ export default function BookingPage() {
                   />
                 </div>
 
-                <Button type="submit" className="w-full bg-primary hover:bg-primary/80 text-white py-3">
-                  Book Service
+                <Button 
+                  type="submit" 
+                  className="w-full bg-primary hover:bg-primary/80 text-white py-3"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Processing..." : "Proceed to Payment"}
                 </Button>
               </form>
             </CardContent>

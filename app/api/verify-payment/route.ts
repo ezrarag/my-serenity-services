@@ -69,11 +69,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({
         success: true,
         order: data[0],
+        paymentIntent: paymentIntent, // Return full payment intent for metadata
         paymentStatus: paymentIntent.status
       })
     } else {
       return NextResponse.json({
         success: false,
+        paymentIntent: paymentIntent, // Return payment intent even if failed
         paymentStatus: paymentIntent.status,
         error: 'Payment not completed'
       })

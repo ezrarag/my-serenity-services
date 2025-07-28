@@ -9,33 +9,122 @@ import { CheckCircle, Home, Calendar, Mail } from "lucide-react"
 
 function SuccessContent() {
   const searchParams = useSearchParams()
-  const [paymentStatus, setPaymentStatus] = useState<string>("")
+  const [paymentStatus, setPaymentStatus] = useState<string>("loading")
   const [orderDetails, setOrderDetails] = useState<any>(null)
+  const [error, setError] = useState<string>("")
 
   useEffect(() => {
     const paymentIntent = searchParams.get("payment_intent")
     const paymentIntentClientSecret = searchParams.get("payment_intent_client_secret")
 
+    console.log('Success page: useEffect triggered')
+    console.log('Success page: payment_intent from URL:', paymentIntent)
+    console.log('Success page: payment_intent_client_secret from URL:', paymentIntentClientSecret)
+
     if (paymentIntent) {
-      // Verify payment status with your backend
+      // First verify payment status
       verifyPayment(paymentIntent)
+    } else {
+      console.log('Success page: No payment_intent found in URL')
+      setPaymentStatus("error")
+      setError("No payment information found")
     }
   }, [searchParams])
 
   const verifyPayment = async (paymentIntentId: string) => {
     try {
+      console.log('Success page: Verifying payment:', paymentIntentId)
+      
       const response = await fetch(`/api/verify-payment?payment_intent=${paymentIntentId}`)
       const data = await response.json()
       
       if (data.success) {
+        console.log('Success page: Payment verified, creating order')
         setPaymentStatus("success")
-        setOrderDetails(data.order)
+        
+        // Create order in database
+        await createOrder(paymentIntentId, data.paymentIntent)
       } else {
         setPaymentStatus("failed")
+        setError("Payment verification failed")
       }
     } catch (error) {
       console.error("Error verifying payment:", error)
       setPaymentStatus("error")
+      setError("Failed to verify payment")
+    }
+  }
+
+  const createOrder = async (paymentIntentId: string, paymentIntent: any) => {
+    try {
+      console.log('Success page: Creating order for payment:', paymentIntentId)
+      console.log('Success page: Payment intent metadata:', paymentIntent.metadata)
+      
+      // Extract customer details from payment intent metadata
+      const metadata = paymentIntent.metadata
+      const customerDetails = {
+        name: metadata.customer_name || 'Unknown Customer',
+        email: metadata.customer_email || 'unknown@example.com',
+        phone: metadata.customer_phone || '',
+        address: metadata.customer_address || 'Address not provided',
+        notes: metadata.notes || ''
+      }
+
+      console.log('Success page: Extracted customer details:', customerDetails)
+
+      // First, create/update user record
+      const userResponse = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: customerDetails.email,
+          name: customerDetails.name,
+          phone: customerDetails.phone,
+          address: customerDetails.address
+        })
+      })
+
+      console.log('Success page: User API response status:', userResponse.status)
+
+      if (!userResponse.ok) {
+        const userErrorData = await userResponse.json()
+        console.error('Success page: User creation failed:', userErrorData)
+        // Continue with order creation even if user creation fails
+      } else {
+        const userData = await userResponse.json()
+        console.log('Success page: User created/updated successfully:', userData)
+      }
+
+      // Then create the order
+      const orderResponse = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerDetails: customerDetails,
+          service: metadata.service_type || 'Unknown Service',
+          amount: paymentIntent.amount / 100, // Convert from cents
+          paymentIntentId: paymentIntentId,
+          scheduledDate: metadata.scheduled_date || new Date().toISOString().split('T')[0],
+          scheduledTime: metadata.scheduled_time || '12:00',
+        })
+      })
+
+      console.log('Success page: Order API response status:', orderResponse.status)
+
+      if (!orderResponse.ok) {
+        const errorData = await orderResponse.json()
+        console.error('Success page: Order creation failed:', errorData)
+        setError(`Payment successful but failed to save order: ${errorData.error || 'Unknown error'}`)
+        return
+      }
+
+      const orderData = await orderResponse.json()
+      console.log('Success page: Order created successfully:', orderData)
+      setOrderDetails(orderData.order)
+      
+    } catch (error) {
+      console.error('Success page: Error creating order:', error)
+      setError('Payment successful but failed to save order. Please contact support.')
     }
   }
 
@@ -104,9 +193,9 @@ function SuccessContent() {
 
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <Button asChild className="flex-1">
-                  <Link href="/">
+                  <Link href="/dashboard">
                     <Home className="w-4 h-4 mr-2" />
-                    Return Home
+                    Go to Dashboard
                   </Link>
                 </Button>
                 <Button asChild variant="outline" className="flex-1">

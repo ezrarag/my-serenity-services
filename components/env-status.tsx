@@ -31,8 +31,8 @@ export function EnvStatus() {
           })
         })
 
-        // Test Supabase configuration
-        const supabaseResponse = await fetch('/api/orders')
+        // Test Supabase configuration - include email parameter
+        const supabaseResponse = await fetch('/api/orders?email=test@test.com')
 
         setEnvStatus({
           stripe: stripeResponse.status !== 500,

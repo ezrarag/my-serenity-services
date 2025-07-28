@@ -1,284 +1,155 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { motion, AnimatePresence } from "framer-motion"
-import { AudioWaveform, X } from "lucide-react"
+import { ChevronDown, ArrowRight, Calendar, Phone, Mail } from "lucide-react"
+import Header from "@/components/header"
 
-interface ServiceCard {
-  id: string
-  title: string
-  subtitle: string
-  image: string
-  color: string
-}
-
-const services: ServiceCard[] = [
+const services = [
   {
     id: "cleaning",
-    title: "HOUSE CLEANING",
-    subtitle: "Professional deep cleaning",
-    image:
-      "https://gfqhzuqckfxtzqawdcso.supabase.co/storage/v1/object/public/usethisfornow/myserenityservices/IMG_0042.png",
-    color: "bg-blue-400",
+    title: "House Cleaning",
+    description: "Professional deep cleaning services that transform your space. Every detail is attended to with care, ensuring a pristine environment that promotes peace and tranquility.",
+    price: "$60/hour",
+    image: "https://gfqhzuqckfxtzqawdcso.supabase.co/storage/v1/object/public/usethisfornow/myserenityservices/IMG_0042.png",
+    video: "https://xsdmcedkxpzfmfkkkgnd.supabase.co/storage/v1/object/public/landing/services/4109221-uhd_2160_4096_25fps.mp4"
   },
   {
     id: "cooking",
-    title: "MEAL PREPARATION",
-    subtitle: "Healthy meal prep services",
-    image:
-      "https://gfqhzuqckfxtzqawdcso.supabase.co/storage/v1/object/public/usethisfornow/myserenityservices/IMG_5529.JPG",
-    color: "bg-orange-400",
+    title: "Meal Preparation",
+    description: "Nutritious and delicious meals prepared with fresh ingredients. Our culinary experts craft balanced dishes that nourish both body and soul.",
+    price: "$50/hour",
+    image: "https://gfqhzuqckfxtzqawdcso.supabase.co/storage/v1/object/public/usethisfornow/myserenityservices/IMG_5529.JPG",
+    video: "https://xsdmcedkxpzfmfkkkgnd.supabase.co/storage/v1/object/public/landing/services/11566289-hd_1080_1920_24fps.mp4"
   },
   {
     id: "combo",
-    title: "CLEANING + COOKING",
-    subtitle: "Complete home care package",
-    image:
-      "https://gfqhzuqckfxtzqawdcso.supabase.co/storage/v1/object/public/usethisfornow/myserenityservices/IMG_5511.JPG",
-    color: "bg-green-400",
+    title: "Cleaning + Cooking Combo",
+    description: "Complete home care package that addresses both your space and nourishment needs. A harmonious blend of cleanliness and culinary excellence.",
+    price: "$75/hour",
+    image: "https://gfqhzuqckfxtzqawdcso.supabase.co/storage/v1/object/public/usethisfornow/myserenityservices/IMG_5511.JPG",
+    video: "https://xsdmcedkxpzfmfkkkgnd.supabase.co/storage/v1/object/public/landing/services/12367941_1080_1920_30fps.mp4"
   },
   {
     id: "massage-60",
-    title: "FULL BODY MASSAGE",
-    subtitle: "60-minute therapeutic massage",
-    image:
-      "https://gfqhzuqckfxtzqawdcso.supabase.co/storage/v1/object/public/usethisfornow/myserenityservices/IMG_0042.png",
-    color: "bg-purple-400",
+    title: "Full Body Massage",
+    description: "60-minute therapeutic massage designed to release tension and restore balance. Experience true relaxation through skilled hands and mindful techniques.",
+    price: "$100",
+    image: "https://gfqhzuqckfxtzqawdcso.supabase.co/storage/v1/object/public/usethisfornow/myserenityservices/IMG_0042.png",
+    video: "https://xsdmcedkxpzfmfkkkgnd.supabase.co/storage/v1/object/public/landing/services/6187091-uhd_2160_3840_25fps.mp4"
   },
   {
     id: "massage-30",
-    title: "EXPRESS MASSAGE",
-    subtitle: "30-minute relaxation massage",
-    image:
-      "https://gfqhzuqckfxtzqawdcso.supabase.co/storage/v1/object/public/usethisfornow/myserenityservices/IMG_1548.png",
-    color: "bg-pink-400",
-  },
+    title: "Express Massage",
+    description: "30-minute relaxation massage for those moments when you need a quick escape. Efficient yet effective treatment for immediate relief.",
+    price: "$50",
+    image: "https://gfqhzuqckfxtzqawdcso.supabase.co/storage/v1/object/public/usethisfornow/myserenityservices/IMG_1548.png",
+    video: "https://xsdmcedkxpzfmfkkkgnd.supabase.co/storage/v1/object/public/landing/services/12367941_1080_1920_30fps.mp4"
+  }
 ]
 
 export default function HomePage() {
-  const [currentIndex, setCurrentIndex] = useState(1)
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [currentService, setCurrentService] = useState(0)
+  const [isVisible, setIsVisible] = useState(false)
 
-  const currentService = services[currentIndex]
-  const prevService = services[currentIndex - 1] || services[services.length - 1]
-  const nextService = services[currentIndex + 1] || services[0]
-
-  const handleCardClick = (direction: "prev" | "next") => {
-    if (direction === "prev") {
-      setCurrentIndex(currentIndex === 0 ? services.length - 1 : currentIndex - 1)
-    } else {
-      setCurrentIndex(currentIndex === services.length - 1 ? 0 : currentIndex + 1)
-    }
-  }
+  useEffect(() => {
+    setIsVisible(true)
+  }, [])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-secondary to-primary/30 relative overflow-hidden font-sans">
-      {/* Top Left - Brand */}
-      <div className="absolute top-6 left-6 md:top-8 md:left-8 z-10">
-        <div className="text-primary text-sm font-medium mb-1">THE SERVICES</div>
-        <h1 className="text-primary text-xl md:text-2xl font-semibold leading-tight">SERENITY SERVICES</h1>
-      </div>
-
-      {/* Top Right - CTA matching screenshot */}
-      <div className="absolute top-6 right-6 md:top-8 md:right-8 z-10 flex items-center gap-4 md:gap-6">
-        <div className="text-primary text-sm font-medium">THE SERVICES</div>
-        <Button
-          asChild
-          className="bg-white border-2 border-primary text-primary hover:bg-secondary px-6 md:px-8 py-2 md:py-3 rounded-full font-medium text-sm tracking-wide shadow-sm"
-        >
-          <Link href="/booking">START BOOKING</Link>
-        </Button>
-      </div>
-
-      {/* Main Content Area - Full Viewport Width */}
-      <div className="flex items-center justify-center min-h-screen w-full px-4 md:px-8">
-        <div className="relative w-full max-w-7xl flex items-center justify-between">
-          {/* Left Card - Previous Service */}
-          <motion.div
-            className="cursor-pointer z-20 flex-shrink-0"
-            onClick={() => handleCardClick("prev")}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <Header />
+      
+      <main>
+        {/* Hero Section */}
+        <section className="relative h-[160vh] flex items-center justify-center overflow-hidden">
+          {/* Background Image */}
+          <div 
+            className="absolute inset-0 bg-cover bg-top bg-no-repeat"
+            style={{
+              backgroundImage: `url(https://xsdmcedkxpzfmfkkkgnd.supabase.co/storage/v1/object/public/landing//IMG_5529.JPG)`,
+            }}
           >
-            <motion.div
-              className="w-20 h-20 md:w-28 md:h-28 rounded-full border-2 border-primary bg-white shadow-lg overflow-hidden"
-              layoutId={`card-${prevService.id}`}
-            >
-              <img
-                src={prevService.image || "/placeholder.svg"}
-                alt={prevService.title}
-                className="w-full h-full object-cover"
-              />
-            </motion.div>
-          </motion.div>
+            <div className="absolute inset-0 bg-black/20"></div>
+          </div>
 
-          {/* Center Card - Current Service */}
-          <div className="text-center z-10 flex-1 mx-8 md:mx-16">
-            <motion.div
-              className="relative mb-6 md:mb-8"
-              key={currentService.id}
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: "spring", stiffness: 200, damping: 20 }}
-            >
-              <motion.div
-                className="w-64 h-64 md:w-80 md:h-80 rounded-full border-4 border-primary bg-white shadow-2xl mx-auto overflow-hidden"
-                layoutId={`card-${currentService.id}`}
-                whileHover={{ scale: 1.05 }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              >
-                <div className="w-full h-full relative">
-                  <motion.img
-                    src={currentService.image}
-                    alt={currentService.title}
-                    className="w-full h-full object-cover"
-                    animate={{
-                      y: [0, -10, 0],
-                      rotate: [0, 2, -2, 0],
-                    }}
-                    transition={{
-                      duration: 4,
-                      repeat: Number.POSITIVE_INFINITY,
-                      ease: "easeInOut",
-                    }}
-                  />
-                  {/* Animated SVG overlay */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <motion.svg
-                      className="w-72 h-72 md:w-80 md:h-80"
-                      viewBox="0 0 100 100"
-                      fill="none"
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 20, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+          {/* Hero Content */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-white z-10">
+            <div className="text-center max-w-4xl mx-auto px-6">
+              <h1 className="text-6xl md:text-8xl font-light mb-8 leading-tight">
+                serenity in every detail
+              </h1>
+              
+              {/* Quote Area */}
+              <div className="mb-12">
+                <blockquote className="text-xl md:text-2xl font-light italic mb-4">
+                  "Where cleanliness meets godliness"
+                </blockquote>
+                <p className="text-lg text-gray-200">Discover the art of mindful cleaning</p>
+              </div>
+              
+              {/* Scroll Indicator */}
+              <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+                <div className="text-center">
+                  <p className="text-sm font-light mb-2">SCROLL TO EXPLORE</p>
+                  <div className="w-px h-8 bg-white mx-auto animate-pulse"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Gradient Overlay for smooth transition */}
+          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#FEFBEB] to-transparent"></div>
+        </section>
+
+        {/* Services Section */}
+        <section className="py-20 bg-amber-50">
+          <div className="container mx-auto px-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {services.map((service, index) => (
+                <motion.div
+                  key={service.id}
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="relative group cursor-pointer"
+                >
+                  <div className="relative w-80 h-96 md:w-96 md:h-[500px] transform rotate-3 hover:rotate-0 transition-transform duration-500">
+                    {/* Video Background */}
+                    <video
+                      className="absolute inset-0 w-full h-full object-cover"
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
                     >
-                      <circle
-                        cx="50"
-                        cy="50"
-                        r="45"
-                        stroke="rgba(255,255,255,0.3)"
-                        strokeWidth="0.5"
-                        strokeDasharray="10 5"
-                      />
-                    </motion.svg>
+                      <source src={service.video} type="video/mp4" />
+                    </video>
+                    
+                    {/* Overlay */}
+                    <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors duration-300"></div>
+                    
+                    {/* Content */}
+                    <div className="absolute inset-0 flex flex-col justify-end p-8 text-white">
+                      <h3 className="text-2xl font-semibold mb-2">{service.title}</h3>
+                      <p className="text-sm mb-4 opacity-90">{service.description}</p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-lg font-medium">{service.price}</span>
+                        <Button asChild variant="ghost" className="text-white hover:text-gray-200">
+                          <Link href={`/cart?service=${service.id}`}>Book Now</Link>
+                        </Button>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            </motion.div>
-
-            <motion.div
-              key={`text-${currentService.id}`}
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-            >
-              <h2 className="text-primary text-3xl md:text-4xl font-bold mb-3 md:mb-4 tracking-wide">
-                {currentService.title}
-              </h2>
-              <p className="text-primary text-base md:text-lg mb-6 md:mb-8 font-medium">{currentService.subtitle}</p>
-
-              <Button
-                asChild
-                className="bg-white border-2 border-primary text-primary hover:bg-secondary px-6 md:px-8 py-2 md:py-3 rounded-full font-medium shadow-sm"
-              >
-                <Link href="/booking">BOOK NOW</Link>
-              </Button>
-            </motion.div>
+                </motion.div>
+              ))}
+            </div>
           </div>
-
-          {/* Right Card - Next Service */}
-          <motion.div
-            className="cursor-pointer z-20 flex-shrink-0"
-            onClick={() => handleCardClick("next")}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
-          >
-            <motion.div
-              className="w-20 h-20 md:w-28 md:h-28 rounded-full border-2 border-primary bg-white shadow-lg overflow-hidden"
-              layoutId={`card-${nextService.id}`}
-            >
-              <img
-                src={nextService.image || "/placeholder.svg"}
-                alt={nextService.title}
-                className="w-full h-full object-cover"
-              />
-            </motion.div>
-          </motion.div>
-        </div>
-      </div>
-
-      {/* Bottom Left - All Services */}
-      <div className="absolute bottom-6 left-6 md:bottom-8 md:left-8 z-10">
-        <Link
-          href="/services"
-          className="text-primary text-sm font-medium hover:text-primary/80 flex items-center gap-2"
-        >
-          <div className="flex gap-1">
-            <div className="w-2 h-2 bg-primary rounded-full"></div>
-            <div className="w-2 h-2 bg-primary/70 rounded-full"></div>
-            <div className="w-2 h-2 bg-primary/70 rounded-full"></div>
-          </div>
-          ALL SERVICES
-        </Link>
-      </div>
-
-      {/* Bottom Right - Notification/Chat Menu */}
-      <div className="absolute bottom-6 right-6 md:bottom-8 md:right-8 z-30">
-        <motion.button
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="w-12 h-12 rounded-full bg-primary text-white shadow-lg flex items-center justify-center hover:bg-primary/80 transition-colors"
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <AudioWaveform className="w-6 h-6" />
-        </motion.button>
-
-        <AnimatePresence>
-          {isMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.8, y: 20 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="absolute bottom-16 right-0 bg-white rounded-lg shadow-xl border border-primary p-4 w-64"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold text-gray-800">Notifications</h3>
-                <button onClick={() => setIsMenuOpen(false)} className="text-gray-400 hover:text-gray-600">
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-              <div className="space-y-2 text-sm text-gray-600">
-                <div className="p-2 bg-secondary rounded">
-                  <p className="font-medium">Welcome to Serenity!</p>
-                  <p className="text-xs text-gray-500">Book your first service today</p>
-                </div>
-                <div className="p-2 bg-gray-50 rounded">
-                  <p className="font-medium">Chat Support</p>
-                  <p className="text-xs text-gray-500">We're here to help 24/7</p>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
-      {/* Service Indicators - Centered */}
-      <div className="absolute bottom-16 md:bottom-20 left-1/2 transform -translate-x-1/2 z-10 flex gap-2">
-        {services.map((_, index) => (
-          <motion.button
-            key={index}
-            onClick={() => setCurrentIndex(index)}
-            className={`w-2 h-2 rounded-full transition-colors duration-200 ${
-              index === currentIndex ? "bg-primary" : "bg-primary/40"
-            }`}
-            whileHover={{ scale: 1.2 }}
-            whileTap={{ scale: 0.8 }}
-          />
-        ))}
-      </div>
+        </section>
+      </main>
     </div>
   )
 }
