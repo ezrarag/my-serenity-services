@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import type React from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { loadStripe } from "@stripe/stripe-js"
@@ -34,7 +34,7 @@ const timeSlots = ["9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:
 // Initialize Stripe
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
-export default function BookingPage() {
+function BookingContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [selectedService, setSelectedService] = useState("")
@@ -141,8 +141,6 @@ export default function BookingPage() {
     }
   }
 
-
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100">
       <div className="container mx-auto px-4 py-8">
@@ -168,19 +166,19 @@ export default function BookingPage() {
             <PricingModal />
           </div>
 
-          {error && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-          
           {orderId && paymentIntentId && (
             <Alert className="mb-6 border-green-200 bg-green-50">
               <CheckCircle className="h-4 w-4 text-green-600" />
               <AlertDescription className="text-green-800">
                 Payment successful! Please schedule your service below.
               </AlertDescription>
+            </Alert>
+          )}
+          
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
           
@@ -252,5 +250,20 @@ export default function BookingPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function BookingPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p>Loading booking page...</p>
+        </div>
+      </div>
+    }>
+      <BookingContent />
+    </Suspense>
   )
 }
