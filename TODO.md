@@ -61,6 +61,21 @@
 - [x] Fixed Next.js 15 build error with useSearchParams() Suspense boundary
 - [x] Added environment variable check API route
 
+### New Features (Latest)
+- [x] **FaceTime Integration**: "Make an Appointment" button now triggers FaceTime calls to 313-629-7791
+  - Automatic FaceTime detection for Apple devices
+  - Fallback to regular phone calls for other devices
+  - Browser notifications when call is initiated
+  - Works from both main header and hamburger menu
+- [x] **Cart Page Redesign**: Complete redesign matching EVER website aesthetic
+  - Split-screen layout with brown left panel and image right panel
+  - Animated scroll line indicator
+  - Professional service carousel with auto-scroll (15 seconds)
+  - Clean service cards with ID numbers and dashed underlines
+  - Removed duplicative sections and improved layout flow
+  - Order summary card positioned over background image
+  - Smooth animations and transitions
+
 ## 🚧 IN PROGRESS
 
 ### Testing & Debugging
@@ -68,6 +83,7 @@
 - [ ] Verify cart functionality from hamburger menu
 - [ ] Test admin dashboard with multiple orders
 - [ ] Validate payment webhook processing
+- [ ] Test FaceTime integration on various devices
 
 ## 📋 PENDING
 
@@ -110,19 +126,22 @@
 ## 🎯 IMMEDIATE NEXT STEPS
 
 1. **Test the complete booking flow** - Verify that orders are being created properly
-2. **Replace video URLs** - Update service cards with actual video content
-3. **Test cart functionality** - Ensure hamburger menu → cart → booking flow works
-4. **Add real content** - Replace placeholder text with actual service information
-5. **Set up production environment** - Configure production Stripe and Supabase keys
+2. **Test FaceTime integration** - Ensure calling functionality works across devices
+3. **Replace video URLs** - Update service cards with actual video content
+4. **Test cart functionality** - Ensure hamburger menu → cart → booking flow works
+5. **Add real content** - Replace placeholder text with actual service information
+6. **Set up production environment** - Configure production Stripe and Supabase keys
 
 ## 📊 CURRENT STATUS
 
-**Overall Progress: 85% Complete**
+**Overall Progress: 90% Complete**
 
 - ✅ Core functionality implemented
 - ✅ Payment processing working
 - ✅ Database integration complete
-- ✅ UI/UX polished
+- ✅ UI/UX polished with new features
+- ✅ FaceTime integration added
+- ✅ Cart page redesigned to match EVER aesthetic
 - 🚧 Testing and content creation needed
 - 📋 Advanced features pending
 
@@ -131,4 +150,6 @@
 - User and order management system
 - Responsive design with modern UI
 - Cart system with hamburger menu integration
-- Admin dashboard for order management 
+- Admin dashboard for order management
+- **FaceTime calling integration**
+- **Professional cart page redesign matching EVER website** 

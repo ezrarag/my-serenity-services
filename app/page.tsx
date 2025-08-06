@@ -69,7 +69,7 @@ export default function HomePage() {
           <div 
             className="absolute inset-0 bg-cover bg-top bg-no-repeat"
             style={{
-              backgroundImage: `url(https://xsdmcedkxpzfmfkkkgnd.supabase.co/storage/v1/object/public/landing//IMG_5529.JPG)`,
+              backgroundImage: `url(https://xsdmcedkxpzfmfkkkgnd.supabase.co/storage/v1/object/public/landing//pexels-liliana-drew-9462144%202.jpg)`,
             }}
           >
             <div className="absolute inset-0 bg-black/20"></div>

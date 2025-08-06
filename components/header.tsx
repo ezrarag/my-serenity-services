@@ -29,6 +29,47 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
 
+  const handleMakeAppointment = () => {
+    const phoneNumber = "313-629-7791"
+    
+    // Try to open FaceTime first
+    const facetimeUrl = `facetime://${phoneNumber}`
+    
+    // Fallback to regular phone call if FaceTime fails
+    const phoneUrl = `tel:${phoneNumber}`
+    
+    // Show notification to user
+    if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad') || navigator.userAgent.includes('Mac')) {
+      // For Apple devices, try FaceTime first
+      window.location.href = facetimeUrl
+      
+      // Fallback after a short delay
+      setTimeout(() => {
+        window.location.href = phoneUrl
+      }, 1000)
+    } else {
+      // For other devices, try phone call
+      window.location.href = phoneUrl
+    }
+    
+    // Show browser notification
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification('Opening FaceTime Call', {
+        body: `Calling ${phoneNumber}`,
+        icon: '/placeholder-logo.png'
+      })
+    } else if ('Notification' in window && Notification.permission !== 'denied') {
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          new Notification('Opening FaceTime Call', {
+            body: `Calling ${phoneNumber}`,
+            icon: '/placeholder-logo.png'
+          })
+        }
+      })
+    }
+  }
+
   return (
     <>
       <header className="fixed top-0 left-0 w-full flex items-center justify-between px-6 py-4 z-40 bg-black/10 backdrop-blur-sm">
@@ -52,10 +93,10 @@ export default function Header() {
         {/* Right - CTA Button */}
         <div className="flex items-center">
           <Button
-            asChild
+            onClick={handleMakeAppointment}
             className="bg-transparent text-white hover:text-gray-200 px-4 py-2 border-none font-medium text-sm tracking-wide"
           >
-            <Link href="/booking">MAKE AN APPOINTMENT</Link>
+            MAKE AN APPOINTMENT
           </Button>
         </div>
       </header>
@@ -83,10 +124,10 @@ export default function Header() {
               </div>
               
               <Button
-                asChild
+                onClick={handleMakeAppointment}
                 className="bg-transparent text-white hover:text-gray-200 px-4 py-2 border-none font-medium text-sm tracking-wide"
               >
-                <Link href="/booking">MAKE AN APPOINTMENT</Link>
+                MAKE AN APPOINTMENT
               </Button>
             </div>
 
@@ -103,7 +144,7 @@ export default function Header() {
                       <Facebook className="w-5 h-5 inline mr-2" />
                       FACEBOOK
                     </Link>
-                    <Link href="#" className="text-white hover:text-gray-300 transition-colors block">
+                    <Link href="https://www.instagram.com/serenityservicesga?igsh=MTMwdTZjbXRiamUxMQ==" className="text-white hover:text-gray-300 transition-colors block">
                       <Instagram className="w-5 h-5 inline mr-2" />
                       INSTAGRAM
                     </Link>
