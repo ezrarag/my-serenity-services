@@ -252,7 +252,7 @@ function CartContent() {
                   className="w-full bg-black text-white hover:bg-gray-800" 
                   disabled={cartItems.length === 0}
                 >
-                  <Link href={`/booking?cart=${JSON.stringify(cartItems)}`}>
+                  <Link href={`/checkout?cart=${JSON.stringify(cartItems)}`}>
                     <CreditCard className="w-4 h-4 mr-2" />
                     Proceed to Checkout
                   </Link>
