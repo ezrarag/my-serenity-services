@@ -16,8 +16,10 @@ import {
   User,
   CheckCircle,
   Clock as ClockIcon,
-  AlertCircle
+  AlertCircle,
+  Chart
 } from "lucide-react"
+import { VisitorDataDisplay } from "@/components/visitor-data-display"
 
 interface Order {
   id: string
@@ -216,202 +218,249 @@ export default function DashboardPage() {
           </Card>
         </div>
 
-        {/* Orders Tabs */}
-        <Tabs defaultValue="all" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="all">All Orders</TabsTrigger>
-            <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
-            <TabsTrigger value="completed">Completed</TabsTrigger>
-            <TabsTrigger value="pending">Pending</TabsTrigger>
+        {/* Main Content Tabs */}
+        <Tabs defaultValue="orders" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="orders">Orders</TabsTrigger>
+            <TabsTrigger value="visitor-data">Visitor Data</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="all" className="space-y-4">
-            {orders.length === 0 ? (
-              <Card>
-                <CardContent className="pt-6 text-center">
-                  <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No orders yet</h3>
-                  <p className="text-gray-600 mb-4">Start by booking your first service</p>
-                  <Button asChild>
-                    <Link href="/booking">Book Your First Service</Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid gap-4">
-                {orders.map((order) => (
-                  <Card key={order.id} className="hover:shadow-md transition-shadow">
-                    <CardContent className="pt-6">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-lg font-semibold">{order.service_type}</h3>
-                            {getStatusIcon(order.status)}
-                            {getStatusBadge(order.status)}
-                            {getPaymentStatusBadge(order.payment_status)}
-                          </div>
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
-                            <div className="flex items-center gap-2">
-                              <Calendar className="w-4 h-4" />
-                              <span>{formatDate(order.scheduled_date)}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Clock className="w-4 h-4" />
-                              <span>{formatTime(order.scheduled_time)}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <DollarSign className="w-4 h-4" />
-                              <span>{formatAmount(order.amount)}</span>
-                            </div>
-                          </div>
-                          {order.notes && (
-                            <p className="text-sm text-gray-500 mt-2">Notes: {order.notes}</p>
-                          )}
-                        </div>
-                        <div className="text-right">
-                          <p className="text-xs text-gray-500">
-                            {formatDate(order.created_at)}
-                          </p>
-                        </div>
-                      </div>
+          {/* Orders Tab */}
+          <TabsContent value="orders" className="space-y-6">
+            <Tabs defaultValue="all" className="space-y-6">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="all">All Orders</TabsTrigger>
+                <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
+                <TabsTrigger value="completed">Completed</TabsTrigger>
+                <TabsTrigger value="pending">Pending</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="all" className="space-y-4">
+                {orders.length === 0 ? (
+                  <Card>
+                    <CardContent className="pt-6 text-center">
+                      <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">No orders yet</h3>
+                      <p className="text-gray-600 mb-4">Start by booking your first service</p>
+                      <Button asChild>
+                        <Link href="/booking">Book Your First Service</Link>
+                      </Button>
                     </CardContent>
                   </Card>
-                ))}
-              </div>
-            )}
+                ) : (
+                  <div className="grid gap-4">
+                    {orders.map((order) => (
+                      <Card key={order.id} className="hover:shadow-md transition-shadow">
+                        <CardContent className="pt-6">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-2">
+                                <h3 className="text-lg font-semibold">{order.service_type}</h3>
+                                {getStatusIcon(order.status)}
+                                {getStatusBadge(order.status)}
+                                {getPaymentStatusBadge(order.payment_status)}
+                              </div>
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+                                <div className="flex items-center gap-2">
+                                  <Calendar className="w-4 h-4" />
+                                  <span>{formatDate(order.scheduled_date)}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Clock className="w-4 h-4" />
+                                  <span>{formatTime(order.scheduled_time)}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <DollarSign className="w-4 h-4" />
+                                  <span>{formatAmount(order.amount)}</span>
+                                </div>
+                              </div>
+                              {order.notes && (
+                                <p className="text-sm text-gray-500 mt-2">Notes: {order.notes}</p>
+                              )}
+                            </div>
+                            <div className="text-right">
+                              <p className="text-xs text-gray-500">
+                                {formatDate(order.created_at)}
+                              </p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </TabsContent>
+
+              <TabsContent value="upcoming" className="space-y-4">
+                {orders.filter(o => new Date(o.scheduled_date) > new Date()).length === 0 ? (
+                  <Card>
+                    <CardContent className="pt-6 text-center">
+                      <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">No upcoming appointments</h3>
+                      <p className="text-gray-600 mb-4">Book a new service to see it here</p>
+                      <Button asChild>
+                        <Link href="/booking">Book New Service</Link>
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <div className="grid gap-4">
+                    {orders
+                      .filter(o => new Date(o.scheduled_date) > new Date())
+                      .map((order) => (
+                        <Card key={order.id} className="hover:shadow-md transition-shadow">
+                          <CardContent className="pt-6">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-3 mb-2">
+                                  <h3 className="text-lg font-semibold">{order.service_type}</h3>
+                                  {getStatusIcon(order.status)}
+                                  {getStatusBadge(order.status)}
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+                                  <div className="flex items-center gap-2">
+                                    <Calendar className="w-4 h-4" />
+                                    <span>{formatDate(order.scheduled_date)}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <Clock className="w-4 h-4" />
+                                    <span>{formatTime(order.scheduled_time)}</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-sm font-medium">{formatAmount(order.amount)}</p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                  </div>
+                )}
+              </TabsContent>
+
+              <TabsContent value="completed" className="space-y-4">
+                {orders.filter(o => o.status === 'completed').length === 0 ? (
+                  <Card>
+                    <CardContent className="pt-6 text-center">
+                      <CheckCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">No completed services</h3>
+                      <p className="text-gray-600">Completed services will appear here</p>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <div className="grid gap-4">
+                    {orders
+                      .filter(o => o.status === 'completed')
+                      .map((order) => (
+                        <Card key={order.id} className="hover:shadow-md transition-shadow">
+                          <CardContent className="pt-6">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-3 mb-2">
+                                  <h3 className="text-lg font-semibold">{order.service_type}</h3>
+                                  {getStatusIcon(order.status)}
+                                  {getStatusBadge(order.status)}
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+                                  <div className="flex items-center gap-2">
+                                    <Calendar className="w-4 h-4" />
+                                    <span>{formatDate(order.scheduled_date)}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <DollarSign className="w-4 h-4" />
+                                    <span>{formatAmount(order.amount)}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                  </div>
+                )}
+              </TabsContent>
+
+              <TabsContent value="pending" className="space-y-4">
+                {orders.filter(o => o.status === 'pending').length === 0 ? (
+                  <Card>
+                    <CardContent className="pt-6 text-center">
+                      <ClockIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">No pending orders</h3>
+                      <p className="text-gray-600">Pending orders will appear here</p>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <div className="grid gap-4">
+                    {orders
+                      .filter(o => o.status === 'pending')
+                      .map((order) => (
+                        <Card key={order.id} className="hover:shadow-md transition-shadow">
+                          <CardContent className="pt-6">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-3 mb-2">
+                                  <h3 className="text-lg font-semibold">{order.service_type}</h3>
+                                  {getStatusIcon(order.status)}
+                                  {getStatusBadge(order.status)}
+                                  {getPaymentStatusBadge(order.payment_status)}
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+                                  <div className="flex items-center gap-2">
+                                    <Calendar className="w-4 h-4" />
+                                    <span>{formatDate(order.scheduled_date)}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <DollarSign className="w-4 h-4" />
+                                    <span>{formatAmount(order.amount)}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
           </TabsContent>
 
-          <TabsContent value="upcoming" className="space-y-4">
-            {orders.filter(o => new Date(o.scheduled_date) > new Date()).length === 0 ? (
-              <Card>
-                <CardContent className="pt-6 text-center">
-                  <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No upcoming appointments</h3>
-                  <p className="text-gray-600 mb-4">Book a new service to see it here</p>
-                  <Button asChild>
-                    <Link href="/booking">Book New Service</Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid gap-4">
-                {orders
-                  .filter(o => new Date(o.scheduled_date) > new Date())
-                  .map((order) => (
-                    <Card key={order.id} className="hover:shadow-md transition-shadow">
-                      <CardContent className="pt-6">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <h3 className="text-lg font-semibold">{order.service_type}</h3>
-                              {getStatusIcon(order.status)}
-                              {getStatusBadge(order.status)}
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
-                              <div className="flex items-center gap-2">
-                                <Calendar className="w-4 h-4" />
-                                <span>{formatDate(order.scheduled_date)}</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Clock className="w-4 h-4" />
-                                <span>{formatTime(order.scheduled_time)}</span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-sm font-medium">{formatAmount(order.amount)}</p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-              </div>
-            )}
+          {/* Visitor Data Tab */}
+          <TabsContent value="visitor-data" className="space-y-6">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Visitor Data Persistence</h2>
+              <p className="text-gray-600">
+                This section shows how your data is automatically saved and persists across browser sessions, 
+                even when you're not logged in. Your cart items, preferences, and profile information are 
+                stored locally and in cookies for a seamless experience.
+              </p>
+            </div>
+            <VisitorDataDisplay />
           </TabsContent>
 
-          <TabsContent value="completed" className="space-y-4">
-            {orders.filter(o => o.status === 'completed').length === 0 ? (
-              <Card>
-                <CardContent className="pt-6 text-center">
-                  <CheckCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No completed services</h3>
-                  <p className="text-gray-600">Completed services will appear here</p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid gap-4">
-                {orders
-                  .filter(o => o.status === 'completed')
-                  .map((order) => (
-                    <Card key={order.id} className="hover:shadow-md transition-shadow">
-                      <CardContent className="pt-6">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <h3 className="text-lg font-semibold">{order.service_type}</h3>
-                              {getStatusIcon(order.status)}
-                              {getStatusBadge(order.status)}
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
-                              <div className="flex items-center gap-2">
-                                <Calendar className="w-4 h-4" />
-                                <span>{formatDate(order.scheduled_date)}</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <DollarSign className="w-4 h-4" />
-                                <span>{formatAmount(order.amount)}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-              </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="pending" className="space-y-4">
-            {orders.filter(o => o.status === 'pending').length === 0 ? (
-              <Card>
-                <CardContent className="pt-6 text-center">
-                  <ClockIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No pending orders</h3>
-                  <p className="text-gray-600">Pending orders will appear here</p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid gap-4">
-                {orders
-                  .filter(o => o.status === 'pending')
-                  .map((order) => (
-                    <Card key={order.id} className="hover:shadow-md transition-shadow">
-                      <CardContent className="pt-6">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <h3 className="text-lg font-semibold">{order.service_type}</h3>
-                              {getStatusIcon(order.status)}
-                              {getStatusBadge(order.status)}
-                              {getPaymentStatusBadge(order.payment_status)}
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
-                              <div className="flex items-center gap-2">
-                                <Calendar className="w-4 h-4" />
-                                <span>{formatDate(order.scheduled_date)}</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <DollarSign className="w-4 h-4" />
-                                <span>{formatAmount(order.amount)}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-              </div>
-            )}
+          {/* Analytics Tab */}
+          <TabsContent value="analytics" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Analytics & Insights</CardTitle>
+                <CardDescription>
+                  View your service usage patterns and preferences
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Chart className="w-8 h-8 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Analytics Coming Soon</h3>
+                  <p className="text-gray-600">
+                    We're working on detailed analytics to help you track your service usage and preferences.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>

@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { ArrowLeft, CreditCard, ShoppingCart, AlertCircle, CheckCircle } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
+import { useVisitorData } from "@/hooks/use-visitor-data"
 
 // Initialize Stripe
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
@@ -37,7 +38,6 @@ interface CheckoutFormData {
 function CheckoutContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const [cartItems, setCartItems] = useState<CartItem[]>([])
   const [loading, setLoading] = useState(true)
   const [formData, setFormData] = useState<CheckoutFormData>({
     name: "",
@@ -51,31 +51,68 @@ function CheckoutContent() {
   const [showPayment, setShowPayment] = useState(false)
   const [paymentIntent, setPaymentIntent] = useState<any>(null)
 
+  // Use visitor data hook for persistent data
+  const { 
+    visitorData, 
+    updateProfile, 
+    getCartItems, 
+    getCartTotal, 
+    getCartItemCount,
+    loading: visitorDataLoading 
+  } = useVisitorData()
+
   useEffect(() => {
-    // Get cart items from URL parameter
-    const cartParam = searchParams.get('cart')
-    if (cartParam) {
-      try {
-        const cart = JSON.parse(decodeURIComponent(cartParam))
-        setCartItems(Array.isArray(cart) ? cart : [cart])
-      } catch (error) {
-        console.error('Error parsing cart data:', error)
-        setError('Invalid cart data')
+    // Get cart items from visitor data or URL parameter
+    if (!visitorDataLoading) {
+      let cartItems: CartItem[] = []
+      
+      // First try to get from visitor data
+      if (visitorData?.cartItems && visitorData.cartItems.length > 0) {
+        cartItems = visitorData.cartItems
+      } else {
+        // Fallback to URL parameter
+        const cartParam = searchParams.get('cart')
+        if (cartParam) {
+          try {
+            const cart = JSON.parse(decodeURIComponent(cartParam))
+            cartItems = Array.isArray(cart) ? cart : [cart]
+          } catch (error) {
+            console.error('Error parsing cart data:', error)
+            setError('Invalid cart data')
+          }
+        }
       }
+
+      // Pre-fill form data if available from visitor data
+      if (visitorData) {
+        setFormData(prev => ({
+          ...prev,
+          name: visitorData.name || "",
+          email: visitorData.email || "",
+          phone: visitorData.phone || "",
+          address: visitorData.address || "",
+        }))
+      }
+
+      setLoading(false)
     }
-    setLoading(false)
-  }, [searchParams])
+  }, [searchParams, visitorData, visitorDataLoading])
 
   const handleInputChange = (field: keyof CheckoutFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
+    
+    // Save to visitor data for future visits
+    if (visitorData) {
+      updateProfile({ [field]: value })
+    }
   }
 
   const getTotalPrice = () => {
-    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0)
+    return getCartTotal()
   }
 
   const getTotalItems = () => {
-    return cartItems.reduce((total, item) => total + item.quantity, 0)
+    return getCartItemCount()
   }
 
   const validateForm = () => {
@@ -95,21 +132,18 @@ function CheckoutContent() {
       setError("Please enter your address")
       return false
     }
-    if (cartItems.length === 0) {
+    if (getTotalItems() === 0) {
       setError("No items in cart")
       return false
     }
-    setError("")
     return true
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (!validateForm()) {
-      return
-    }
-
+    if (!validateForm()) return
+    
     setIsSubmitting(true)
     setError("")
 
@@ -117,30 +151,42 @@ function CheckoutContent() {
       // Create payment intent
       const response = await fetch('/api/create-payment-intent', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
-          amount: getTotalPrice(),
-          cartItems: cartItems,
-          customerDetails: formData,
-        })
+          items: getCartItems(),
+          customer: {
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            address: formData.address,
+          },
+          notes: formData.notes,
+        }),
       })
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to create payment intent')
+        throw new Error('Failed to create payment intent')
       }
 
       const data = await response.json()
+      setPaymentIntent(data.clientSecret)
+      setShowPayment(true)
       
-      if (!data.clientSecret) {
-        throw new Error('Invalid payment intent response')
+      // Save customer data to visitor profile
+      if (visitorData) {
+        updateProfile({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          address: formData.address,
+        })
       }
       
-      setPaymentIntent(data)
-      setShowPayment(true)
     } catch (error) {
-      console.error('Error creating payment intent:', error)
-      setError(error instanceof Error ? error.message : 'Failed to initialize payment. Please try again.')
+      console.error('Error:', error)
+      setError('Failed to process checkout. Please try again.')
     } finally {
       setIsSubmitting(false)
     }
@@ -148,40 +194,57 @@ function CheckoutContent() {
 
   const handlePaymentSuccess = async (paymentIntentId: string) => {
     try {
-      // Save order to database
-      const orderResponse = await fetch('/api/orders', {
+      // Create order
+      const response = await fetch('/api/orders', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
-          customerDetails: formData,
-          cartItems: cartItems,
-          amount: getTotalPrice(),
-          paymentIntentId: paymentIntentId,
-        })
+          customer_name: formData.name,
+          customer_email: formData.email,
+          customer_phone: formData.phone,
+          customer_address: formData.address,
+          items: getCartItems(),
+          total_amount: getTotalPrice(),
+          notes: formData.notes,
+          payment_intent_id: paymentIntentId,
+        }),
       })
 
-      if (!orderResponse.ok) {
-        const errorData = await orderResponse.json()
-        throw new Error(`Failed to save order: ${errorData.error || 'Unknown error'}`)
+      if (response.ok) {
+        // Redirect to success page
+        router.push('/success')
+      } else {
+        setError('Failed to create order. Please contact support.')
       }
-
-      const orderData = await orderResponse.json()
-      console.log('Order created successfully:', orderData)
-
-      // Redirect to confirmation page with order details
-      router.push(`/confirmation?order=${orderData.id}&payment_intent=${paymentIntentId}`)
     } catch (error) {
-      console.error('Error saving order:', error)
-      setError(error instanceof Error ? error.message : 'Payment successful but failed to save order. Please contact support.')
+      console.error('Error creating order:', error)
+      setError('Failed to create order. Please contact support.')
     }
   }
 
-  if (loading) {
+  if (loading || visitorDataLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p>Loading checkout...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading checkout...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (getTotalItems() === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <ShoppingCart className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Your cart is empty</h2>
+          <p className="text-gray-600 mb-6">Add some services before proceeding to checkout</p>
+          <Button asChild>
+            <Link href="/cart">Return to Cart</Link>
+          </Button>
         </div>
       </div>
     )
@@ -189,277 +252,187 @@ function CheckoutContent() {
 
   if (showPayment && paymentIntent) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex items-center gap-4 mb-8">
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={() => setShowPayment(false)}
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <div>
-              <h1 className="text-3xl font-bold text-primary">Complete Payment</h1>
-              <p className="text-primary">Secure payment powered by Stripe</p>
-            </div>
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="container mx-auto px-4 max-w-2xl">
+          <div className="mb-6">
+            <Link href="/checkout" className="text-primary hover:underline">
+              <ArrowLeft className="w-4 h-4 inline mr-2" />
+              Back to checkout
+            </Link>
           </div>
-
-          <div className="max-w-2xl mx-auto">
-            <Card className="border-primary">
-              <CardHeader>
-                <CardTitle className="text-primary">Payment Details</CardTitle>
-                <CardDescription>
-                  Total: ${getTotalPrice()} - {getTotalItems()} item{getTotalItems() !== 1 ? 's' : ''}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Elements stripe={stripePromise} options={{ clientSecret: paymentIntent.clientSecret }}>
-                  <PaymentForm 
-                    clientSecret={paymentIntent.clientSecret}
-                    onSuccess={handlePaymentSuccess}
-                    onError={(error) => setError(error)}
-                  />
-                </Elements>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  if (cartItems.length === 0) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex items-center gap-4 mb-8">
-            <Button asChild variant="ghost" size="icon">
-              <Link href="/cart">
-                <ArrowLeft className="w-5 h-5" />
-              </Link>
-            </Button>
-            <div>
-              <h1 className="text-3xl font-bold text-primary">Checkout</h1>
-              <p className="text-primary">Complete your purchase</p>
-            </div>
-          </div>
-
-          <div className="max-w-2xl mx-auto">
-            <Card>
-              <CardContent className="text-center py-12">
-                <ShoppingCart className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Your cart is empty</h3>
-                <p className="text-gray-600 mb-6">Add some services to proceed to checkout</p>
-                <Button asChild>
-                  <Link href="/cart">
-                    Return to Cart
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CreditCard className="w-5 h-5" />
+                Complete Payment
+              </CardTitle>
+              <CardDescription>
+                Secure payment powered by Stripe
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Elements stripe={stripePromise} options={{ clientSecret: paymentIntent }}>
+                <PaymentForm 
+                  onSuccess={handlePaymentSuccess}
+                  customerEmail={formData.email}
+                />
+              </Elements>
+            </CardContent>
+          </Card>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="container mx-auto px-4 max-w-4xl">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <Button asChild variant="ghost" size="icon">
-            <Link href="/cart">
-              <ArrowLeft className="w-5 h-5" />
-            </Link>
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold text-primary">Checkout</h1>
-            <p className="text-primary">Complete your purchase</p>
-          </div>
+        <div className="mb-8">
+          <Link href="/cart" className="text-primary hover:underline">
+            <ArrowLeft className="w-4 h-4 inline mr-2" />
+            Back to cart
+          </Link>
+          <h1 className="text-3xl font-bold text-gray-900 mt-4">Checkout</h1>
+          <p className="text-gray-600">Complete your order and payment</p>
         </div>
 
-        <div className="max-w-4xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Order Summary */}
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <ShoppingCart className="w-5 h-5" />
-                    Order Summary
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {cartItems.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div>
-                        <h4 className="font-semibold">{item.title}</h4>
-                        <p className="text-sm text-gray-600">{item.duration}</p>
-                        <p className="text-sm text-gray-500">Quantity: {item.quantity}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-semibold">${item.price * item.quantity}</p>
-                        <p className="text-sm text-gray-600">${item.price} each</p>
-                      </div>
-                    </div>
-                  ))}
-                  
-                  <div className="border-t pt-4">
-                    <div className="flex justify-between font-semibold text-lg">
-                      <span>Total ({getTotalItems()} items)</span>
-                      <span>${getTotalPrice()}</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Checkout Form */}
+          <div className="lg:col-span-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Customer Information</CardTitle>
+                <CardDescription>
+                  Please provide your details to complete the order
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {error && (
+                  <Alert className="mb-6 border-red-200 bg-red-50">
+                    <AlertCircle className="w-4 h-4" />
+                    <AlertDescription className="text-red-800">
+                      {error}
+                    </AlertDescription>
+                  </Alert>
+                )}
 
-              {/* Customer Information */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Customer Information</CardTitle>
-                  <CardDescription>Please provide your contact details</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    {error && (
-                      <Alert variant="destructive">
-                        <AlertCircle className="h-4 w-4" />
-                        <AlertDescription>{error}</AlertDescription>
-                      </Alert>
-                    )}
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="name">Full Name *</Label>
-                        <Input
-                          id="name"
-                          value={formData.name}
-                          onChange={(e) => handleInputChange("name", e.target.value)}
-                          placeholder="Your full name"
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="email">Email *</Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          value={formData.email}
-                          onChange={(e) => handleInputChange("email", e.target.value)}
-                          placeholder="your@email.com"
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Phone Number *</Label>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="name">Full Name *</Label>
                       <Input
-                        id="phone"
-                        type="tel"
-                        value={formData.phone}
-                        onChange={(e) => handleInputChange("phone", e.target.value)}
-                        placeholder="(555) 123-4567"
+                        id="name"
+                        value={formData.name}
+                        onChange={(e) => handleInputChange('name', e.target.value)}
+                        placeholder="Enter your full name"
                         required
                       />
                     </div>
+                    <div>
+                      <Label htmlFor="email">Email Address *</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => handleInputChange('email', e.target.value)}
+                        placeholder="Enter your email"
+                        required
+                      />
+                    </div>
+                  </div>
 
-                    <div className="space-y-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="phone">Phone Number *</Label>
+                      <Input
+                        id="phone"
+                        value={formData.phone}
+                        onChange={(e) => handleInputChange('phone', e.target.value)}
+                        placeholder="Enter your phone number"
+                        required
+                      />
+                    </div>
+                    <div>
                       <Label htmlFor="address">Service Address *</Label>
                       <Input
                         id="address"
                         value={formData.address}
-                        onChange={(e) => handleInputChange("address", e.target.value)}
-                        placeholder="Where should we provide the service?"
+                        onChange={(e) => handleInputChange('address', e.target.value)}
+                        placeholder="Enter service address"
                         required
                       />
                     </div>
+                  </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="notes">Additional Notes (Optional)</Label>
-                      <Textarea
-                        id="notes"
-                        value={formData.notes}
-                        onChange={(e) => handleInputChange("notes", e.target.value)}
-                        placeholder="Any special requests or notes..."
-                        rows={3}
-                      />
+                  <div>
+                    <Label htmlFor="notes">Additional Notes</Label>
+                    <Textarea
+                      id="notes"
+                      value={formData.notes}
+                      onChange={(e) => handleInputChange('notes', e.target.value)}
+                      placeholder="Any special instructions or requests..."
+                      rows={3}
+                    />
+                  </div>
+
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full bg-primary hover:bg-primary/90"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <CreditCard className="w-4 h-4 mr-2" />
+                        Proceed to Payment
+                      </>
+                    )}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Order Summary */}
+          <div className="lg:col-span-1">
+            <Card className="sticky top-8">
+              <CardHeader>
+                <CardTitle>Order Summary</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  {getCartItems().map((item) => (
+                    <div key={item.id} className="flex justify-between text-sm">
+                      <span>{item.title} x {item.quantity}</span>
+                      <span>${item.price * item.quantity}</span>
                     </div>
-
-                    <Button 
-                      type="submit" 
-                      className="w-full bg-primary hover:bg-primary/80 text-white py-3"
-                      disabled={isSubmitting}
-                    >
-                      {isSubmitting ? (
-                        <div className="flex items-center gap-2">
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                          Processing...
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <CreditCard className="w-4 h-4" />
-                          Proceed to Payment
-                        </div>
-                      )}
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Payment Information */}
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <CreditCard className="w-5 h-5" />
-                    Payment Information
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center gap-2 text-green-600">
-                    <CheckCircle className="w-4 h-4" />
-                    <span className="text-sm">Secure payment powered by Stripe</span>
+                  ))}
+                </div>
+                
+                <div className="border-t pt-4">
+                  <div className="flex justify-between font-bold text-lg">
+                    <span>Total ({getTotalItems()} items)</span>
+                    <span>${getTotalPrice()}</span>
                   </div>
-                  
-                  <div className="space-y-2">
-                    <h4 className="font-semibold">What's included:</h4>
-                    <ul className="text-sm text-gray-600 space-y-1">
-                      <li>• Professional service delivery</li>
-                      <li>• Quality guarantee</li>
-                      <li>• Customer support</li>
-                      <li>• Secure payment processing</li>
-                    </ul>
-                  </div>
+                </div>
 
-                  <div className="bg-blue-50 p-4 rounded-lg">
-                    <h4 className="font-semibold text-blue-900 mb-2">Next Steps:</h4>
-                    <ol className="text-sm text-blue-800 space-y-1">
-                      <li>1. Complete your payment</li>
-                      <li>2. Schedule your appointment</li>
-                      <li>3. Receive confirmation</li>
-                      <li>4. Enjoy your service!</li>
-                    </ol>
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <div className="flex items-start gap-2">
+                    <CheckCircle className="w-5 h-5 text-blue-600 mt-0.5" />
+                    <div className="text-sm text-blue-800">
+                      <p className="font-medium">Secure Checkout</p>
+                      <p>Your payment information is protected by Stripe's secure infrastructure.</p>
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
-
-              {/* Security Badge */}
-              <Card className="border-green-200 bg-green-50">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2 text-green-700">
-                    <CheckCircle className="w-5 h-5" />
-                    <span className="font-semibold">Secure Checkout</span>
-                  </div>
-                  <p className="text-sm text-green-600 mt-1">
-                    Your payment information is encrypted and secure. We never store your payment details.
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
@@ -470,10 +443,10 @@ function CheckoutContent() {
 export default function CheckoutPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p>Loading checkout...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading checkout...</p>
         </div>
       </div>
     }>

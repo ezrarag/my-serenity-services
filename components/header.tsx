@@ -70,6 +70,31 @@ export default function Header() {
     }
   }
 
+  const handleWhatsAppCall = () => {
+    const phoneNumber = "313-629-7791"
+    const message = "Hi! I'd like to schedule a service with Serenity Services."
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
+    
+    window.open(whatsappUrl, '_blank')
+    
+    // Show browser notification
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification('Opening WhatsApp', {
+        body: `Opening WhatsApp chat with ${phoneNumber}`,
+        icon: '/placeholder-logo.png'
+      })
+    } else if ('Notification' in window && Notification.permission !== 'denied') {
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          new Notification('Opening WhatsApp', {
+            body: `Opening WhatsApp chat with ${phoneNumber}`,
+            icon: '/placeholder-logo.png'
+          })
+        }
+      })
+    }
+  }
+
   return (
     <>
       <header className="fixed top-0 left-0 w-full flex items-center justify-between px-6 py-4 z-40 bg-black/10 backdrop-blur-sm">
@@ -166,22 +191,36 @@ export default function Header() {
                   {/* Booking Options */}
                   <div className="mb-12">
                     <h3 className="text-white text-lg font-medium mb-4">FOR BOOKING</h3>
-                    <Link href="#" className="text-white hover:text-gray-300 transition-colors block mb-2">
+                    <button 
+                      onClick={handleWhatsAppCall}
+                      className="text-white hover:text-gray-300 transition-colors block mb-2 w-full text-left"
+                    >
                       <MessageCircle className="w-4 h-4 inline mr-2" />
                       / SCHEDULE VIA WHATSAPP
-                    </Link>
-                    <Link href="#" className="text-white hover:text-gray-300 transition-colors block">
+                    </button>
+                    <button 
+                      onClick={handleMakeAppointment}
+                      className="text-white hover:text-gray-300 transition-colors block w-full text-left"
+                    >
                       <Phone className="w-4 h-4 inline mr-2" />
                       / SCHEDULE VIA CALL
-                    </Link>
+                    </button>
                   </div>
                 </div>
 
                 {/* Contact Button */}
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-12 bg-gray-200 rounded"></div>
-                  <Button className="bg-gray-200 text-black hover:bg-gray-300 px-6 py-3 rounded-none">
-                    CONTACT US
+                  <Button 
+                    onClick={() => setIsMenuOpen(false)}
+                    className="bg-gray-200 text-black hover:bg-gray-300 px-6 py-3 rounded-none"
+                  >
+                    BOOK NOW
+                  </Button>
+                  <Button 
+                    asChild
+                    className="bg-gray-200 text-black hover:bg-gray-300 px-6 py-3 rounded-none"
+                  >
+                    <Link href="/contact">CONTACT US</Link>
                   </Button>
                 </div>
               </div>
