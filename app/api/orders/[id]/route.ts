@@ -1,15 +1,31 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-const supabase = createClient(supabaseUrl, supabaseServiceKey)
+// Check if Supabase environment variables are available
+if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  console.warn('Supabase environment variables are not set')
+}
+
+const supabase = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY
+  ? createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    )
+  : null
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
+    if (!supabase) {
+      console.error('Orders API: Supabase client not initialized')
+      return NextResponse.json(
+        { error: 'Database is not configured - switching to Firebase' },
+        { status: 500 }
+      )
+    }
+
     const { id } = params
 
     // Fetch order details
@@ -49,6 +65,14 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
+    if (!supabase) {
+      console.error('Orders API: Supabase client not initialized')
+      return NextResponse.json(
+        { error: 'Database is not configured - switching to Firebase' },
+        { status: 500 }
+      )
+    }
+
     const { id } = params
     const body = await request.json()
     const { scheduledDate, scheduledTime, notes } = body
