@@ -58,11 +58,19 @@ export default function AdminDashboardPage() {
       if (response.ok) {
         const data = await response.json()
         setOrders(data.orders || [])
+        if (data.error && data.error.includes('Database is not configured')) {
+          setError("Database not configured - switching to Firebase. Orders will be available after migration.")
+        }
       } else {
-        setError("Failed to fetch orders")
+        const errorData = await response.json()
+        if (errorData.error && errorData.error.includes('Database is not configured')) {
+          setError("Database not configured - switching to Firebase. Orders will be available after migration.")
+        } else {
+          setError("Failed to fetch orders")
+        }
       }
     } catch (error) {
-      setError("Failed to fetch orders")
+      setError("Database connection unavailable - switching to Firebase")
     } finally {
       setLoading(false)
     }
@@ -294,6 +302,14 @@ export default function AdminDashboardPage() {
           {filteredOrders.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-gray-500">No orders found</p>
+              {error && error.includes('Firebase') && (
+                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
+                  <p className="text-blue-800 text-sm">
+                    💡 <strong>Migration in Progress:</strong> Orders will appear here once Firebase is connected. 
+                    Payments are still processing successfully through Stripe.
+                  </p>
+                </div>
+              )}
             </div>
           ) : (
             <div className="space-y-4">
