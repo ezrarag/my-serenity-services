@@ -111,7 +111,7 @@ export default function Header() {
         {/* Center - Brand */}
         <div className="flex items-center">
           <Link href="/" className="text-white text-2xl font-light tracking-wide">
-            SERENITY
+            
           </Link>
         </div>
 
@@ -145,7 +145,7 @@ export default function Header() {
               </button>
               
               <div className="text-white text-2xl font-light tracking-wide">
-                SERENITY
+                
               </div>
               
               <Button

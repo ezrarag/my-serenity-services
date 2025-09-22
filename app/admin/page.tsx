@@ -46,6 +46,7 @@ export default function AdminDashboardPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [serviceFilter, setServiceFilter] = useState("all")
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState("all")
 
   useEffect(() => {
     fetchAllOrders()
@@ -76,15 +77,19 @@ export default function AdminDashboardPage() {
     
     const matchesStatus = statusFilter === "all" || order.status === statusFilter
     const matchesService = serviceFilter === "all" || order.service_type === serviceFilter
+    const matchesPaymentStatus = paymentStatusFilter === "all" || order.payment_status === paymentStatusFilter
     
-    return matchesSearch && matchesStatus && matchesService
+    return matchesSearch && matchesStatus && matchesService && matchesPaymentStatus
   })
 
   // Calculate statistics
   const totalOrders = orders.length
   const totalRevenue = orders.reduce((sum, order) => sum + order.amount, 0)
+  const paidRevenue = orders.filter(order => order.payment_status === 'paid').reduce((sum, order) => sum + order.amount, 0)
+  const pendingPayments = orders.filter(order => order.payment_status === 'pending').reduce((sum, order) => sum + order.amount, 0)
   const pendingOrders = orders.filter(order => order.status === 'pending').length
   const completedOrders = orders.filter(order => order.status === 'completed').length
+  const paidOrders = orders.filter(order => order.payment_status === 'paid').length
 
   // Helper functions
   const getStatusBadge = (status: string) => {
@@ -141,7 +146,7 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
@@ -149,6 +154,9 @@ export default function AdminDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalOrders}</div>
+            <p className="text-xs text-muted-foreground">
+              {paidOrders} paid, {pendingOrders} pending
+            </p>
           </CardContent>
         </Card>
 
@@ -159,26 +167,35 @@ export default function AdminDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatAmount(totalRevenue)}</div>
+            <p className="text-xs text-muted-foreground">
+              All orders combined
+            </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Orders</CardTitle>
-            <ClockIcon className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Paid Revenue</CardTitle>
+            <CheckCircle className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{pendingOrders}</div>
+            <div className="text-2xl font-bold text-green-600">{formatAmount(paidRevenue)}</div>
+            <p className="text-xs text-muted-foreground">
+              Successfully collected
+            </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Completed Orders</CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Pending Payments</CardTitle>
+            <ClockIcon className="h-4 w-4 text-yellow-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{completedOrders}</div>
+            <div className="text-2xl font-bold text-yellow-600">{formatAmount(pendingPayments)}</div>
+            <p className="text-xs text-muted-foreground">
+              Awaiting payment
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -189,7 +206,7 @@ export default function AdminDashboardPage() {
           <CardTitle>Filters</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div>
               <label className="text-sm font-medium mb-2 block">Search</label>
               <Input
@@ -200,7 +217,7 @@ export default function AdminDashboardPage() {
             </div>
             
             <div>
-              <label className="text-sm font-medium mb-2 block">Status</label>
+              <label className="text-sm font-medium mb-2 block">Order Status</label>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger>
                   <SelectValue />
@@ -208,8 +225,26 @@ export default function AdminDashboardPage() {
                 <SelectContent>
                   <SelectItem value="all">All Statuses</SelectItem>
                   <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="confirmed">Confirmed</SelectItem>
+                  <SelectItem value="in_progress">In Progress</SelectItem>
                   <SelectItem value="completed">Completed</SelectItem>
                   <SelectItem value="cancelled">Cancelled</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium mb-2 block">Payment Status</label>
+              <Select value={paymentStatusFilter} onValueChange={setPaymentStatusFilter}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Payments</SelectItem>
+                  <SelectItem value="paid">Paid</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="failed">Failed</SelectItem>
+                  <SelectItem value="refunded">Refunded</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -222,10 +257,11 @@ export default function AdminDashboardPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Services</SelectItem>
-                  <SelectItem value="Standard Cleaning">Standard Cleaning</SelectItem>
-                  <SelectItem value="Deep Cleaning">Deep Cleaning</SelectItem>
-                  <SelectItem value="Move-in/Move-out">Move-in/Move-out</SelectItem>
-                  <SelectItem value="Post Construction">Post Construction</SelectItem>
+                  <SelectItem value="cleaning">House Cleaning</SelectItem>
+                  <SelectItem value="cooking">Meal Preparation</SelectItem>
+                  <SelectItem value="combo">Cleaning + Cooking Combo</SelectItem>
+                  <SelectItem value="massage-60">Full Body Massage</SelectItem>
+                  <SelectItem value="massage-30">Express Massage</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -271,9 +307,12 @@ export default function AdminDashboardPage() {
                         {getPaymentStatusBadge(order.payment_status)}
                       </div>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-gray-600">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 text-sm text-gray-600">
                         <div>
                           <span className="font-medium">Email:</span> {order.customer_email}
+                        </div>
+                        <div>
+                          <span className="font-medium">Phone:</span> {order.customer_phone || 'N/A'}
                         </div>
                         <div>
                           <span className="font-medium">Service:</span> {order.service_type}
@@ -284,6 +323,11 @@ export default function AdminDashboardPage() {
                         <div>
                           <span className="font-medium">Scheduled:</span> {formatDate(order.scheduled_date)} at {formatTime(order.scheduled_time)}
                         </div>
+                      </div>
+                      
+                      <div className="mt-2 text-sm text-gray-500">
+                        <span className="font-medium">Payment ID:</span> {order.payment_intent_id || 'N/A'} | 
+                        <span className="font-medium ml-2">Ordered:</span> {formatDate(order.created_at)}
                       </div>
                       
                       {order.notes && (
