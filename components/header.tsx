@@ -133,24 +133,27 @@ export default function Header() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black z-50 flex"
+            className="fixed inset-0 z-50 flex"
+            style={{ backgroundColor: '#C9BEE2' }}
           >
             {/* Header */}
             <div className="absolute top-0 left-0 w-full flex items-center justify-between px-6 py-4">
               <button 
                 onClick={() => setIsMenuOpen(false)}
-                className="text-white hover:text-gray-200 transition-colors"
+                className="hover:opacity-70 transition-opacity"
+                style={{ color: '#284C67' }}
               >
                 <X className="w-6 h-6" />
               </button>
               
-              <div className="text-white text-2xl font-light tracking-wide">
+              <div className="text-2xl font-light tracking-wide" style={{ color: '#284C67' }}>
                 
               </div>
               
               <Button
                 onClick={handleMakeAppointment}
-                className="bg-transparent text-white hover:text-gray-200 px-4 py-2 border-none font-medium text-sm tracking-wide"
+                className="bg-transparent hover:opacity-70 px-4 py-2 border-none font-medium text-sm tracking-wide transition-opacity"
+                style={{ color: '#284C67' }}
               >
                 MAKE AN APPOINTMENT
               </Button>
@@ -161,15 +164,15 @@ export default function Header() {
               {/* Left Panel */}
               <div className="w-1/2 p-12 flex flex-col justify-between">
                 <div>
-                  <h2 className="text-white text-4xl font-light mb-8">MENU</h2>
+                  <h2 className="text-4xl font-light mb-8" style={{ color: '#284C67' }}>MENU</h2>
                   
                   {/* Social Links */}
                   <div className="mb-12">
-                    <Link href="#" className="text-white hover:text-gray-300 transition-colors block mb-2">
+                    <Link href="#" className="hover:opacity-70 transition-opacity block mb-2" style={{ color: '#284C67' }}>
                       <Facebook className="w-5 h-5 inline mr-2" />
                       FACEBOOK
                     </Link>
-                    <Link href="https://www.instagram.com/serenityservicesga?igsh=MTMwdTZjbXRiamUxMQ==" className="text-white hover:text-gray-300 transition-colors block">
+                    <Link href="https://www.instagram.com/serenityservicesga?igsh=MTMwdTZjbXRiamUxMQ==" className="hover:opacity-70 transition-opacity block" style={{ color: '#284C67' }}>
                       <Instagram className="w-5 h-5 inline mr-2" />
                       INSTAGRAM
                     </Link>
@@ -181,7 +184,8 @@ export default function Header() {
                       <Link
                         key={item.name}
                         href={item.href}
-                        className="text-white hover:text-gray-300 transition-colors block mb-4"
+                        className="hover:opacity-70 transition-opacity block mb-4"
+                        style={{ color: '#284C67' }}
                       >
                         / {item.name}
                       </Link>
@@ -190,17 +194,19 @@ export default function Header() {
 
                   {/* Booking Options */}
                   <div className="mb-12">
-                    <h3 className="text-white text-lg font-medium mb-4">FOR BOOKING</h3>
+                    <h3 className="text-lg font-medium mb-4" style={{ color: '#284C67' }}>FOR BOOKING</h3>
                     <button 
                       onClick={handleWhatsAppCall}
-                      className="text-white hover:text-gray-300 transition-colors block mb-2 w-full text-left"
+                      className="hover:opacity-70 transition-opacity block mb-2 w-full text-left"
+                      style={{ color: '#284C67' }}
                     >
                       <MessageCircle className="w-4 h-4 inline mr-2" />
                       / SCHEDULE VIA WHATSAPP
                     </button>
                     <button 
                       onClick={handleMakeAppointment}
-                      className="text-white hover:text-gray-300 transition-colors block w-full text-left"
+                      className="hover:opacity-70 transition-opacity block w-full text-left"
+                      style={{ color: '#284C67' }}
                     >
                       <Phone className="w-4 h-4 inline mr-2" />
                       / SCHEDULE VIA CALL
@@ -244,11 +250,11 @@ export default function Header() {
                       >
                         <div className="flex items-center justify-between">
                           <div>
-                            <div className="text-white text-sm font-light">{service.id}</div>
-                            <div className="text-white text-lg font-medium">{service.name}</div>
+                            <div className="text-sm font-light" style={{ color: '#284C67' }}>{service.id}</div>
+                            <div className="text-lg font-medium" style={{ color: '#284C67' }}>{service.name}</div>
                             <div className="text-gray-400 text-sm">{service.category}</div>
                           </div>
-                          <ArrowUpRight className="w-4 h-4 text-white" />
+                          <ArrowUpRight className="w-4 h-4" style={{ color: '#284C67' }} />
                         </div>
                       </motion.div>
                     </Link>

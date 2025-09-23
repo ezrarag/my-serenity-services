@@ -73,6 +73,9 @@ function CartContent() {
     loading: visitorDataLoading 
   } = useVisitorData()
   
+  // Ensure cartItems is always an array
+  const safeCartItems = cartItems || []
+  
   // Transform values for animations
   const scrollLineHeight = useTransform(scrollY, [0, 300], [0, 100])
 
@@ -142,10 +145,10 @@ function CartContent() {
   }
 
   const handleCheckout = () => {
-    if (cartItems.length === 0) return
+    if (safeCartItems.length === 0) return
     
     // Encode cart data for checkout
-    const cartData = encodeURIComponent(JSON.stringify(cartItems))
+    const cartData = encodeURIComponent(JSON.stringify(safeCartItems))
     window.location.href = `/checkout?cart=${cartData}`
   }
 
@@ -201,7 +204,7 @@ function CartContent() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {cartItems.length === 0 ? (
+                {safeCartItems.length === 0 ? (
                   <div className="text-center py-12">
                     <ShoppingCart className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                     <h3 className="text-lg font-medium text-gray-900 mb-2">Your cart is empty</h3>
@@ -341,7 +344,7 @@ function CartContent() {
 
                 <Button 
                   onClick={handleCheckout}
-                  disabled={cartItems.length === 0}
+                  disabled={safeCartItems.length === 0}
                   className="w-full bg-amber-600 hover:bg-amber-700"
                 >
                   <CreditCard className="w-4 h-4 mr-2" />
@@ -351,7 +354,7 @@ function CartContent() {
                 <Button 
                   onClick={clearCart}
                   variant="outline"
-                  disabled={cartItems.length === 0}
+                  disabled={safeCartItems.length === 0}
                   className="w-full"
                 >
                   Clear Cart
