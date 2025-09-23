@@ -36,7 +36,7 @@ const services = [
     title: "Full Body Massage",
     // description: "60-minute therapeutic massage designed to release tension and restore balance. Experience true relaxation through skilled hands and mindful techniques.",
     price: "$150",
-    image: "https://firebasestorage.googleapis.com/v0/b/readyaimgo-clients-temp.firebasestorage.app/o/serenity-services%2Ffull-body-pexels-tima-miroshnichenko-6187264.jpg?alt=media&token=2449d083-a1a4-4fc2-acb5-184878b0dcbd",
+    image: "https://firebasestorage.googleapis.com/v0/b/beam-home.firebasestorage.app/o/delirare%2Fmassage-therapist-hands.jpeg?alt=media&token=2fd1fd5c-cc1a-41b1-ad0e-fd6353e5157d",
     video: "https://xsdmcedkxpzfmfkkkgnd.supabase.co/storage/v1/object/public/landing/services/6187091-uhd_2160_3840_25fps.mp4"
   },
   {
