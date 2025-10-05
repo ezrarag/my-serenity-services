@@ -17,7 +17,7 @@ import {
   CheckCircle,
   Clock as ClockIcon,
   AlertCircle,
-  Chart,
+  BarChart3,
   LogIn,
   LogOut
 } from "lucide-react"
@@ -45,7 +45,7 @@ export default function DashboardPage() {
   const [showLogin, setShowLogin] = useState(false)
   const [loginData, setLoginData] = useState({ email: "", password: "" })
   
-  const { user, signIn, signUp, logout, loading: authLoading } = useFirebaseAuth()
+  const { user, signIn, signUp, logout, loading: authLoading, error: authError } = useFirebaseAuth()
 
   useEffect(() => {
     if (user) {
@@ -160,7 +160,7 @@ export default function DashboardPage() {
           <CardHeader>
             <CardTitle className="text-center">Welcome to Your Dashboard</CardTitle>
             <CardDescription className="text-center">
-              Sign in to view your orders and manage your bookings
+              {authError ? 'Authentication is currently unavailable. Please try again later.' : 'Sign in to view your orders and manage your bookings'}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -176,6 +176,7 @@ export default function DashboardPage() {
                   onChange={(e) => setLoginData(prev => ({ ...prev, email: e.target.value }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                   required
+                  disabled={!!authError}
                 />
               </div>
               <div>
@@ -189,14 +190,15 @@ export default function DashboardPage() {
                   onChange={(e) => setLoginData(prev => ({ ...prev, password: e.target.value }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                   required
+                  disabled={!!authError}
                 />
               </div>
               <div className="flex gap-2">
-                <Button type="submit" className="flex-1" disabled={authLoading}>
+                <Button type="submit" className="flex-1" disabled={authLoading || !!authError}>
                   <LogIn className="w-4 h-4 mr-2" />
                   Sign In
                 </Button>
-                <Button type="button" variant="outline" onClick={handleSignUp} disabled={authLoading}>
+                <Button type="button" variant="outline" onClick={handleSignUp} disabled={authLoading || !!authError}>
                   Sign Up
                 </Button>
               </div>
@@ -546,7 +548,7 @@ export default function DashboardPage() {
               <CardContent>
                 <div className="text-center py-12">
                   <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Chart className="w-8 h-8 text-gray-400" />
+                    <BarChart3 className="w-8 h-8 text-gray-400" />
                   </div>
                   <h3 className="text-lg font-medium text-gray-900 mb-2">Analytics Coming Soon</h3>
                   <p className="text-gray-600">

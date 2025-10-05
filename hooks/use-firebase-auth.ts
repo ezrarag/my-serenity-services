@@ -16,6 +16,12 @@ export function useFirebaseAuth() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    // Check if Firebase is configured
+    if (!auth) {
+      setLoading(false)
+      return
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user)
       setLoading(false)
@@ -26,6 +32,12 @@ export function useFirebaseAuth() {
   }, [])
 
   const signIn = async (email: string, password: string) => {
+    if (!auth) {
+      setError('Firebase not configured. Authentication disabled.')
+      setLoading(false)
+      return null
+    }
+    
     try {
       setError(null)
       setLoading(true)
@@ -40,6 +52,12 @@ export function useFirebaseAuth() {
   }
 
   const signUp = async (email: string, password: string) => {
+    if (!auth) {
+      setError('Firebase not configured. Authentication disabled.')
+      setLoading(false)
+      return null
+    }
+    
     try {
       setError(null)
       setLoading(true)
@@ -54,6 +72,11 @@ export function useFirebaseAuth() {
   }
 
   const logout = async () => {
+    if (!auth) {
+      setError('Firebase not configured. Authentication disabled.')
+      return
+    }
+    
     try {
       setError(null)
       await signOut(auth)
