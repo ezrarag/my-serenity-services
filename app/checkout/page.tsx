@@ -32,6 +32,8 @@ interface CheckoutFormData {
   email: string
   phone: string
   address: string
+  scheduledDate: string
+  scheduledTime: string
   notes: string
 }
 
@@ -44,6 +46,8 @@ function CheckoutContent() {
     email: "",
     phone: "",
     address: "",
+    scheduledDate: "",
+    scheduledTime: "",
     notes: "",
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -132,6 +136,14 @@ function CheckoutContent() {
       setError("Please enter your address")
       return false
     }
+    if (!formData.scheduledDate.trim()) {
+      setError("Please select a service date")
+      return false
+    }
+    if (!formData.scheduledTime.trim()) {
+      setError("Please select a service time")
+      return false
+    }
     if (getTotalItems() === 0) {
       setError("No items in cart")
       return false
@@ -148,6 +160,9 @@ function CheckoutContent() {
     setError("")
 
     try {
+      // Calculate total amount from cart items
+      const totalAmount = getCartItems().reduce((total, item) => total + (item.price * item.quantity), 0)
+      
       // Create payment intent
       const response = await fetch('/api/create-payment-intent', {
         method: 'POST',
@@ -155,14 +170,17 @@ function CheckoutContent() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          items: getCartItems(),
-          customer: {
+          amount: Math.round(totalAmount * 100), // Convert to cents for Stripe
+          service: getCartItems().map(item => item.title).join(', '),
+          customerDetails: {
             name: formData.name,
             email: formData.email,
             phone: formData.phone,
             address: formData.address,
+            notes: formData.notes,
+            scheduledDate: formData.scheduledDate,
+            scheduledTime: formData.scheduledTime,
           },
-          notes: formData.notes,
         }),
       })
 
@@ -361,6 +379,30 @@ function CheckoutContent() {
                         value={formData.address}
                         onChange={(e) => handleInputChange('address', e.target.value)}
                         placeholder="Enter service address"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="scheduledDate">Service Date *</Label>
+                      <Input
+                        id="scheduledDate"
+                        type="date"
+                        value={formData.scheduledDate}
+                        onChange={(e) => handleInputChange('scheduledDate', e.target.value)}
+                        min={new Date().toISOString().split('T')[0]}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="scheduledTime">Service Time *</Label>
+                      <Input
+                        id="scheduledTime"
+                        type="time"
+                        value={formData.scheduledTime}
+                        onChange={(e) => handleInputChange('scheduledTime', e.target.value)}
                         required
                       />
                     </div>

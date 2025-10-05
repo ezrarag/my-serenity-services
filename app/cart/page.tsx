@@ -5,7 +5,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Plus, Minus, Trash2, ShoppingCart, CreditCard, ChevronLeft, ChevronRight } from "lucide-react"
+import { ArrowLeft, Plus, Minus, Trash2, ShoppingCart, CreditCard, ChevronLeft, ChevronRight, User } from "lucide-react"
 import { motion, useScroll, useTransform } from "framer-motion"
 import { useVisitorData } from "@/hooks/use-visitor-data"
 
@@ -35,7 +35,7 @@ const services = [
     id: "massage-60",
     title: "Full Body Massage",
     description: "60-minute therapeutic massage designed to release tension and restore balance. Experience true relaxation through skilled hands and mindful techniques.",
-    price: 100,
+    price: 150,
     duration: "60 minutes"
   },
   {
@@ -95,7 +95,7 @@ function CartContent() {
         })
       }
     }
-  }, [searchParams, visitorDataLoading, addToCart])
+  }, [searchParams, visitorDataLoading])
 
   // Auto-scroll carousel every 15 seconds
   useEffect(() => {
@@ -145,10 +145,15 @@ function CartContent() {
   }
 
   const handleCheckout = () => {
-    if (safeCartItems.length === 0) return
+    console.log('Checkout clicked, cart items:', safeCartItems)
+    if (safeCartItems.length === 0) {
+      console.log('No items in cart, checkout disabled')
+      return
+    }
     
     // Encode cart data for checkout
     const cartData = encodeURIComponent(JSON.stringify(safeCartItems))
+    console.log('Redirecting to checkout with cart data:', cartData)
     window.location.href = `/checkout?cart=${cartData}`
   }
 
@@ -215,7 +220,7 @@ function CartContent() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {cartItems.map((item) => (
+                    {safeCartItems.map((item) => (
                       <div key={item.id} className="flex items-center justify-between p-4 border rounded-lg">
                         <div className="flex-1">
                           <h4 className="font-medium text-gray-900">{item.title}</h4>
@@ -327,7 +332,7 @@ function CartContent() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  {cartItems.map((item) => (
+                  {safeCartItems.map((item) => (
                     <div key={item.id} className="flex justify-between text-sm">
                       <span>{item.title} x {item.quantity}</span>
                       <span>${item.price * item.quantity}</span>
@@ -352,12 +357,27 @@ function CartContent() {
                 </Button>
 
                 <Button 
-                  onClick={clearCart}
+                  onClick={() => {
+                    console.log('Clear cart clicked')
+                    clearCart()
+                    console.log('Cart cleared')
+                  }}
                   variant="outline"
                   disabled={safeCartItems.length === 0}
-                  className="w-full"
+                  className="w-full mb-3"
                 >
                   Clear Cart
+                </Button>
+
+                <Button 
+                  asChild
+                  variant="outline"
+                  className="w-full"
+                >
+                  <Link href="/dashboard" className="flex items-center justify-center">
+                    <User className="w-4 h-4 mr-2" />
+                    View Dashboard
+                  </Link>
                 </Button>
               </CardContent>
             </Card>

@@ -17,9 +17,12 @@ import {
   CheckCircle,
   Clock as ClockIcon,
   AlertCircle,
-  Chart
+  Chart,
+  LogIn,
+  LogOut
 } from "lucide-react"
 import { VisitorDataDisplay } from "@/components/visitor-data-display"
+import { useFirebaseAuth } from "@/hooks/use-firebase-auth"
 
 interface Order {
   id: string
@@ -39,13 +42,19 @@ export default function DashboardPage() {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
+  const [showLogin, setShowLogin] = useState(false)
+  const [loginData, setLoginData] = useState({ email: "", password: "" })
+  
+  const { user, signIn, signUp, logout, loading: authLoading } = useFirebaseAuth()
 
   useEffect(() => {
-    // For demo purposes, we'll use a mock email
-    // In a real app, you'd get this from user authentication
-    const userEmail = "test@example.com"
-    fetchOrders(userEmail)
-  }, [])
+    if (user) {
+      // Fetch orders for authenticated user
+      fetchOrders(user.email || "")
+    } else {
+      setLoading(false)
+    }
+  }, [user])
 
   const fetchOrders = async (email: string) => {
     try {
@@ -60,6 +69,28 @@ export default function DashboardPage() {
       setError("Failed to fetch orders")
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      await signIn(loginData.email, loginData.password)
+      setShowLogin(false)
+      setLoginData({ email: "", password: "" })
+    } catch (error) {
+      console.error("Login failed:", error)
+    }
+  }
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      await signUp(loginData.email, loginData.password)
+      setShowLogin(false)
+      setLoginData({ email: "", password: "" })
+    } catch (error) {
+      console.error("Sign up failed:", error)
     }
   }
 
@@ -121,7 +152,62 @@ export default function DashboardPage() {
     }).format(amount)
   }
 
-  if (loading) {
+  // Show login form if not authenticated
+  if (!user && !authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="text-center">Welcome to Your Dashboard</CardTitle>
+            <CardDescription className="text-center">
+              Sign in to view your orders and manage your bookings
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium mb-1">
+                  Email
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  value={loginData.email}
+                  onChange={(e) => setLoginData(prev => ({ ...prev, email: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium mb-1">
+                  Password
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  value={loginData.password}
+                  onChange={(e) => setLoginData(prev => ({ ...prev, password: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                  required
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button type="submit" className="flex-1" disabled={authLoading}>
+                  <LogIn className="w-4 h-4 mr-2" />
+                  Sign In
+                </Button>
+                <Button type="button" variant="outline" onClick={handleSignUp} disabled={authLoading}>
+                  Sign Up
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  if (loading || authLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -140,14 +226,22 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-              <p className="text-gray-600">Manage your bookings and payments</p>
+              <p className="text-gray-600">
+                Welcome, {user?.email} • Manage your bookings and payments
+              </p>
             </div>
-            <Button asChild>
-              <Link href="/booking">
-                <Plus className="w-4 h-4 mr-2" />
-                Book New Service
-              </Link>
-            </Button>
+            <div className="flex gap-2">
+              <Button asChild>
+                <Link href="/booking">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Book New Service
+                </Link>
+              </Button>
+              <Button variant="outline" onClick={logout}>
+                <LogOut className="w-4 h-4 mr-2" />
+                Sign Out
+              </Button>
+            </div>
           </div>
         </div>
       </div>

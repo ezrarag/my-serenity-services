@@ -40,7 +40,7 @@ export function useVisitorData() {
   }
 
   // Save visitor data to both localStorage and cookies
-  const saveVisitorData = (data: Partial<VisitorData>) => {
+  const saveVisitorData = (data: Partial<VisitorData>, incrementVisitCount: boolean = false) => {
     if (typeof window === 'undefined') return
 
     const currentData = getVisitorDataFromStorage()
@@ -48,7 +48,7 @@ export function useVisitorData() {
       ...currentData,
       ...data,
       lastVisit: new Date().toISOString(),
-      visitCount: (currentData?.visitCount || 0) + 1
+      visitCount: incrementVisitCount ? (currentData?.visitCount || 0) + 1 : (currentData?.visitCount || 0)
     }
 
     // Save to localStorage
@@ -107,7 +107,7 @@ export function useVisitorData() {
       data.lastVisit = new Date().toISOString()
     }
 
-    saveVisitorData(data)
+    saveVisitorData(data, true)
     setVisitorData(data)
     setLoading(false)
   }
@@ -156,7 +156,9 @@ export function useVisitorData() {
 
   // Clear cart
   const clearCart = () => {
+    console.log('clearCart called, current visitorData:', visitorData)
     saveVisitorData({ cartItems: [] })
+    console.log('clearCart completed')
   }
 
   // Update visitor profile

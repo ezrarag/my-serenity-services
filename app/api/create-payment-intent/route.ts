@@ -37,8 +37,8 @@ export async function POST(request: NextRequest) {
       customer_phone: customerDetails.phone || '',
       customer_address: customerDetails.address || '',
       notes: customerDetails.notes || '',
-      scheduled_date: new Date().toISOString().split('T')[0],
-      scheduled_time: '12:00', // Default time, will be updated by booking form
+      scheduled_date: customerDetails.scheduledDate || new Date().toISOString().split('T')[0],
+      scheduled_time: customerDetails.scheduledTime || '12:00',
       environment: process.env.NODE_ENV || 'development'
     }
 

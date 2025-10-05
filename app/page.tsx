@@ -52,8 +52,6 @@ const services = [
 export default function HomePage() {
   const [currentService, setCurrentService] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
-  const [hoveredCard, setHoveredCard] = useState<string | null>(null)
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [activeCardIndex, setActiveCardIndex] = useState(0)
   const heroRef = useRef<HTMLDivElement>(null)
   const servicesRef = useRef<HTMLDivElement>(null)
@@ -74,14 +72,6 @@ export default function HomePage() {
     setIsVisible(true)
   }, [])
 
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY })
-    }
-
-    window.addEventListener('mousemove', handleMouseMove)
-    return () => window.removeEventListener('mousemove', handleMouseMove)
-  }, [])
 
   return (
     <div className="min-h-screen bg-white">
@@ -152,7 +142,8 @@ export default function HomePage() {
         {/* Services Section */}
         <section ref={servicesRef} className="relative py-20 bg-transparent z-10">
           <div className="container mx-auto px-4">
-            <div className="flex justify-center">
+            <div className="flex justify-center items-start gap-12">
+              {/* Services Carousel */}
               <div className="relative">
                 {/* Navigation Arrows */}
                 <div className="absolute -left-16 top-1/2 transform -translate-y-1/2 z-20">
@@ -175,48 +166,7 @@ export default function HomePage() {
                 {/* Stacked Cards */}
                 <div className="relative w-96 h-[500px]">
                   {services.map((service, index) => {
-                    const isHovered = hoveredCard === service.id
                     const isActive = index === activeCardIndex
-                    const isBehind = hoveredCard && hoveredCard !== service.id
-                    const springX = useSpring(0, { stiffness: 150, damping: 15 })
-                    const springY = useSpring(0, { stiffness: 150, damping: 15 })
-                    const springScale = useSpring(1, { stiffness: 150, damping: 15 })
-                    const springRotate = useSpring(3, { stiffness: 150, damping: 15 })
-                    
-                    // Mouse attraction effect
-                    useEffect(() => {
-                      if (isHovered) {
-                        const cardElement = document.getElementById(`card-${service.id}`)
-                        if (cardElement) {
-                          const rect = cardElement.getBoundingClientRect()
-                          const cardCenterX = rect.left + rect.width / 2
-                          const cardCenterY = rect.top + rect.height / 2
-                          
-                          const deltaX = (mousePosition.x - cardCenterX) * 0.1
-                          const deltaY = (mousePosition.y - cardCenterY) * 0.1
-                          
-                          springX.set(deltaX)
-                          springY.set(deltaY)
-                          springScale.set(1.05)
-                          springRotate.set(0)
-                        }
-                      } else if (isBehind) {
-                        springX.set(0)
-                        springY.set(0)
-                        springScale.set(0.85)
-                        springRotate.set(3)
-                      } else if (isActive) {
-                        springX.set(0)
-                        springY.set(-20)
-                        springScale.set(1.02)
-                        springRotate.set(0)
-                      } else {
-                        springX.set(0)
-                        springY.set(0)
-                        springScale.set(0.9)
-                        springRotate.set(3)
-                      }
-                    }, [mousePosition, isHovered, isBehind, isActive, service.id])
 
                     return (
                       <motion.div
@@ -228,19 +178,10 @@ export default function HomePage() {
                         viewport={{ once: true }}
                         className="absolute inset-0 group cursor-pointer"
                         style={{
-                          x: springX,
-                          y: springY,
-                          scale: springScale,
-                          rotate: springRotate,
-                          zIndex: isActive ? 10 : (isHovered ? 15 : services.length - index),
-                          opacity: isBehind ? 0.3 : (isActive ? 1 : 0.7)
+                          zIndex: isActive ? 10 : services.length - index,
+                          opacity: isActive ? 1 : 0.7
                         }}
-                        onMouseEnter={() => setHoveredCard(service.id)}
-                        onMouseLeave={() => setHoveredCard(null)}
                         onClick={() => setActiveCardIndex(index)}
-                        whileHover={{ 
-                          transition: { duration: 0.3 }
-                        }}
                       >
                         <div className="relative w-full h-full">
                           {/* Image Background */}
@@ -293,6 +234,40 @@ export default function HomePage() {
                     />
                   ))}
                 </div>
+              </div>
+
+              {/* Auset Introduction */}
+              <div className="hidden lg:block">
+                <motion.div
+                  initial={{ opacity: 0, x: 40 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5, duration: 0.6, type: "spring" }}
+                  className="sticky top-24"
+                >
+                  <div className="bg-white rounded-lg shadow-lg p-6 text-center max-w-sm">
+                    <div className="mb-6">
+                      <img
+                        src="https://firebasestorage.googleapis.com/v0/b/readyaimgo-clients-temp.firebasestorage.app/o/serenity-services%2Fserenity.png?alt=media&token=3c49bd8d-00d8-46e3-9884-5b1e5ffc1291"
+                        alt="Serenity Services Logo"
+                        className="w-full max-w-[180px] mx-auto mb-4 rounded-lg"
+                      />
+                      <h3 className="text-xl font-semibold text-gray-900 mb-2">Hi, I'm Auset</h3>
+                      <p className="text-gray-600 text-sm leading-relaxed">
+                        Welcome to Serenity Services! I'm here to help you create a peaceful, clean, and nourishing environment in your home. 
+                        Experience our professional cleaning, meal preparation, and massage services designed to bring tranquility to your space.
+                      </p>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <Button asChild className="w-full bg-amber-600 hover:bg-amber-700">
+                        <Link href="/contact">Get In Touch</Link>
+                      </Button>
+                      <Button asChild variant="outline" className="w-full">
+                        <Link href="/services">View All Services</Link>
+                      </Button>
+                    </div>
+                  </div>
+                </motion.div>
               </div>
             </div>
           </div>

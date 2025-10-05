@@ -20,8 +20,8 @@ const services = [
 const navigation = [
   { name: "OUR STORY", href: "/about" },
   { name: "JOURNAL", href: "/blog" },
-  { name: "LOCATION", href: "/location" },
   { name: "SERVICES", href: "/services" },
+  { name: "CART", href: "/cart" },
   { name: "DASHBOARD", href: "/dashboard" },
 ]
 
